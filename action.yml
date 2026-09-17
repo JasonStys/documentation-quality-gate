@@ -1,0 +1,41 @@
+name: Documentation Quality Gate
+description: Validate technical documentation and publish actionable annotations and reports.
+author: Jason Stys
+branding:
+  color: blue
+  icon: book-open
+inputs:
+  config:
+    description: Path to the quality-gate configuration file.
+    required: false
+    default: .docquality.json
+  paths:
+    description: Newline-separated paths to scan; configuration include patterns apply within them.
+    required: false
+    default: .
+  changed-from:
+    description: Optional Git revision used to scan only changed documentation files.
+    required: false
+  fail-on:
+    description: Lowest severity that fails the action (error, warning, notice, or none).
+    required: false
+  output-directory:
+    description: Directory for JSON, SARIF, and HTML reports.
+    required: false
+    default: reports/documentation-quality
+outputs:
+  errors:
+    description: Number of unsuppressed error diagnostics.
+  warnings:
+    description: Number of unsuppressed warning diagnostics.
+  notices:
+    description: Number of unsuppressed notice diagnostics.
+  report-json:
+    description: Path to the JSON report.
+  report-sarif:
+    description: Path to the SARIF report.
+  report-html:
+    description: Path to the HTML report.
+runs:
+  using: node24
+  main: dist/index.js

@@ -1,0 +1,15 @@
+{
+  "include": ["**/*.{md,html}"],
+  "exclude": [],
+  "failOn": "warning",
+  "requiredMetadata": ["title", "id", "version"],
+  "externalLinks": {
+    "enabled": false,
+    "timeoutMs": 1000,
+    "retries": 0,
+    "concurrency": 2,
+    "cacheTtlHours": 24,
+    "allowPrivateHosts": false
+  },
+  "suppressions": []
+}

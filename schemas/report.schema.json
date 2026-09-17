@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/documentation-quality-gate/report.schema.json",
+  "title": "Documentation Quality Gate report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "summary", "failed", "diagnostics"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "failed": { "type": "boolean" },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "errors", "warnings", "notices", "suppressed", "durationMs"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "notices": { "type": "integer", "minimum": 0 },
+        "suppressed": { "type": "integer", "minimum": 0 },
+        "durationMs": { "type": "number", "minimum": 0 }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "ruleId",
+          "severity",
+          "message",
+          "remediation",
+          "file",
+          "location",
+          "fingerprint",
+          "suppressed"
+        ],
+        "properties": {
+          "ruleId": { "type": "string" },
+          "severity": { "enum": ["error", "warning", "notice"] },
+          "message": { "type": "string" },
+          "remediation": { "type": "string" },
+          "file": { "type": "string" },
+          "location": { "type": "object" },
+          "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "suppressed": { "type": "boolean" },
+          "suppressionReason": { "type": "string" }
+        }
+      }
+    }
+  }
+}

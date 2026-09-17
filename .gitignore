@@ -1,0 +1,6 @@
+/artifacts/
+/coverage/
+/node_modules/
+/reports/
+*.tgz
+.docquality-cache.json

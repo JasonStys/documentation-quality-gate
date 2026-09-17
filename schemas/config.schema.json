@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/documentation-quality-gate/config.schema.json",
+  "title": "Documentation Quality Gate configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "include": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "default": ["**/*.{md,html}"]
+    },
+    "exclude": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": ["node_modules/**", "dist/**", "coverage/**"]
+    },
+    "failOn": {
+      "enum": ["error", "warning", "notice", "none"],
+      "default": "error"
+    },
+    "requiredMetadata": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": ["title"]
+    },
+    "baselineFile": {
+      "type": "string",
+      "minLength": 1,
+      "default": ".docquality-baseline.json"
+    },
+    "externalLinks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 250,
+          "maximum": 30000,
+          "default": 4000
+        },
+        "retries": { "type": "integer", "minimum": 0, "maximum": 3, "default": 1 },
+        "concurrency": { "type": "integer", "minimum": 1, "maximum": 16, "default": 4 },
+        "cacheTtlHours": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 720,
+          "default": 24
+        },
+        "allowPrivateHosts": { "type": "boolean", "default": false }
+      }
+    },
+    "suppressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ruleId", "rationale"],
+        "properties": {
+          "ruleId": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 },
+          "line": { "type": "integer", "minimum": 1 },
+          "rationale": { "type": "string", "minLength": 8 },
+          "expires": { "type": "string", "format": "date" }
+        }
+      }
+    }
+  }
+}

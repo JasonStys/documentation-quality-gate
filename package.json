@@ -1,0 +1,71 @@
+{
+  "name": "documentation-quality-gate",
+  "version": "1.0.0",
+  "description": "A deterministic TypeScript CLI and GitHub Action for actionable technical-documentation quality checks.",
+  "keywords": [
+    "documentation",
+    "github-action",
+    "quality-gate",
+    "sarif",
+    "accessibility",
+    "markdown"
+  ],
+  "license": "MIT",
+  "author": "Jason Stys",
+  "type": "module",
+  "bin": {
+    "doc-quality": "dist/lib/cli.js"
+  },
+  "files": [
+    "dist/",
+    "action.yml",
+    "schemas/",
+    "docs/configuration.md",
+    "docs/rules.md"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "benchmark": "tsx scripts/benchmark.ts",
+    "build": "pnpm clean && tsc -p tsconfig.build.json && node scripts/build-action.mjs",
+    "clean": "node scripts/clean.mjs",
+    "dogfood": "tsx src/cli.ts examples/valid --config examples/valid/.docquality.json --output-dir artifacts/dogfood",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "pack:artifact": "pnpm build && pnpm pack --pack-destination artifacts",
+    "test": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
+    "typecheck": "tsc --noEmit",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm dogfood && node scripts/verify-package.mjs"
+  },
+  "dependencies": {
+    "@actions/core": "3.0.1",
+    "commander": "15.0.0",
+    "fast-glob": "3.3.3",
+    "minimatch": "10.2.6",
+    "parse5": "8.0.1",
+    "remark-frontmatter": "5.0.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
+    "unist-util-visit": "5.1.0",
+    "yaml": "2.9.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.3",
+    "@types/unist": "3.0.3",
+    "@vitest/coverage-v8": "5.0.1",
+    "esbuild": "0.28.2",
+    "eslint": "10.10.0",
+    "prettier": "3.9.6",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.1"
+  }
+}

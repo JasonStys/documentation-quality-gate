@@ -1,0 +1,16 @@
+{
+  "$schema": "./schemas/config.schema.json",
+  "include": ["README.md", "docs/**/*.md", "examples/valid/**/*.{md,html}"],
+  "exclude": ["docs/reports/**"],
+  "failOn": "error",
+  "requiredMetadata": [],
+  "externalLinks": {
+    "enabled": false,
+    "timeoutMs": 4000,
+    "retries": 1,
+    "concurrency": 4,
+    "cacheTtlHours": 24,
+    "allowPrivateHosts": false
+  },
+  "suppressions": []
+}
