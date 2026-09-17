@@ -7,13 +7,13 @@ import { access, readFile } from 'node:fs/promises';
 
 const required = [
   'action.yml',
-  'dist/index.js',
+  'dist/index.cjs',
   'dist/lib/cli.js',
   'dist/lib/scanner.js',
   'schemas/config.schema.json',
 ];
 await Promise.all(required.map((file) => access(file)));
-const actionBundle = await readFile('dist/index.js', 'utf8');
+const actionBundle = await readFile('dist/index.cjs', 'utf8');
 if (!actionBundle.includes('Documentation quality policy failed')) {
   throw new Error('Action bundle does not contain the expected entry point.');
 }

@@ -83,10 +83,10 @@ Line locations are verified against version 1.0.0 source after formatting. They 
 
 ## Build and performance scripts
 
-| File                         | Declaration       | Line | Inputs and variables used                           |
-| ---------------------------- | ----------------- | ---: | --------------------------------------------------- |
-| `scripts/benchmark.ts`       | `sizes`           |   19 | Corpus sizes 100, 1,000, and 10,000.                |
-| `scripts/benchmark.ts`       | `writeFixtures`   |   23 | Temporary root, count, bounded 100-file batches.    |
-| `scripts/build-action.mjs`   | Top-level build   |    8 | Absolute entry/output, Node 24 ESM bundle settings. |
-| `scripts/clean.mjs`          | Top-level cleanup |    8 | Repository-local `dist` target.                     |
-| `scripts/verify-package.mjs` | `required`        |    8 | Required package/action artifact list.              |
+| File                         | Declaration       | Line | Inputs and variables used                                |
+| ---------------------------- | ----------------- | ---: | -------------------------------------------------------- |
+| `scripts/benchmark.ts`       | `sizes`           |   19 | Corpus sizes 100, 1,000, and 10,000.                     |
+| `scripts/benchmark.ts`       | `writeFixtures`   |   23 | Temporary root, count, bounded 100-file batches.         |
+| `scripts/build-action.mjs`   | Top-level build   |    8 | Absolute entry/output, Node 24 CommonJS bundle settings. |
+| `scripts/clean.mjs`          | Top-level cleanup |    8 | Repository-local `dist` target.                          |
+| `scripts/verify-package.mjs` | `required`        |    8 | Required package/action artifact list.                   |

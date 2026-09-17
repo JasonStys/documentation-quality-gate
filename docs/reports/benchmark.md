@@ -8,11 +8,11 @@
 
 Measured on 2026-09-16 using Node.js 24.18.1 on a Windows local workstation with a local filesystem:
 
-| Pages | Complete scan | Throughput | Diagnostics |
-| ---: | ---: | ---: | ---: |
-| 100 | 116.710 ms | 856.8 pages/s | 0 |
-| 1,000 | 625.337 ms | 1,599.1 pages/s | 0 |
-| 10,000 | 5,060.572 ms | 1,976.1 pages/s | 0 |
+|  Pages | Complete scan |      Throughput | Diagnostics |
+| -----: | ------------: | --------------: | ----------: |
+|    100 |    116.710 ms |   856.8 pages/s |           0 |
+|  1,000 |    625.337 ms | 1,599.1 pages/s |           0 |
+| 10,000 |  5,060.572 ms | 1,976.1 pages/s |           0 |
 
 Results are also machine-readable in the CI artifact `artifacts/benchmark.json`.
 

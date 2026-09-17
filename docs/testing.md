@@ -29,7 +29,7 @@ The suite enforces at least 88% statements/lines, 85% functions, and 75% branche
 
 1. Install the packed tarball into an empty directory.
 2. Run `doc-quality --help` and the valid example corpus.
-3. Invoke `dist/index.js` with representative Action inputs.
+3. Invoke `dist/index.cjs` with representative Action inputs.
 4. Open the HTML report with keyboard-only navigation and a screen-reader spot check.
 5. Upload SARIF to a test repository and confirm exact annotations.
 6. Review `pnpm audit`, CodeQL, package contents, and generated source maps.

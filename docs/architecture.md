@@ -57,7 +57,7 @@ Let `F` be discovered files, `N` the total parsed nodes, `L` local links, and `E
 
 ## Deployment
 
-The npm package exposes `dist/lib/cli.js`. GitHub Actions invokes the committed, esbuild-bundled `dist/index.js` using the Node 24 runtime. Reports are ordinary files suitable for artifact upload, SARIF ingestion, or dashboards. No service or database is required.
+The npm package exposes `dist/lib/cli.js`. GitHub Actions invokes the committed, esbuild-bundled `dist/index.cjs` using the Node 24 runtime. The Action bundle is CommonJS because `@actions/core` currently includes dependencies that use dynamic `require`; the CLI and library remain ESM. Reports are ordinary files suitable for artifact upload, SARIF ingestion, or dashboards. No service or database is required.
 
 ## Decisions
 

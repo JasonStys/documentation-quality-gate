@@ -36,7 +36,7 @@ Rule IDs are API surface. Never reuse an ID for different semantics.
 
 ## Pull requests
 
-Use a focused branch, conventional commit-style subject, and a PR description with behavior, tests, security impact, and evidence. CI must pass on Windows/Linux and Node 22/24. Do not hand-edit `dist/index.js`; rebuild it with `pnpm build` and review the source change that produced it.
+Use a focused branch, conventional commit-style subject, and a PR description with behavior, tests, security impact, and evidence. CI must pass on Windows/Linux and Node 22/24. Do not hand-edit `dist/index.cjs`; rebuild it with `pnpm build` and review the source change that produced it.
 
 ## Release process
 

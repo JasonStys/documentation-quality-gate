@@ -193,7 +193,7 @@ The baseline records exact fingerprints for current findings. New findings remai
 | `src/rules.ts`                                | Rule catalog and deterministic evaluation.                                                                  |
 | `src/reporters.ts`                            | Console, JSON, SARIF, and escaped self-contained HTML reports.                                              |
 | `src/scanner.ts`                              | Bounded orchestration, parse-failure conversion, summaries, and thresholds.                                 |
-| `scripts/build-action.mjs`                    | Bundles the Action and dependencies into `dist/index.js`.                                                   |
+| `scripts/build-action.mjs`                    | Bundles the Action and dependencies into `dist/index.cjs`.                                                  |
 | `scripts/benchmark.ts`                        | Generates and scans 100/1,000/10,000-page corpora.                                                          |
 | `scripts/clean.mjs`                           | Cross-platform generated-output cleanup.                                                                    |
 | `scripts/verify-package.mjs`                  | Verifies required consumer artifacts.                                                                       |
@@ -204,7 +204,7 @@ The baseline records exact fingerprints for current findings. New findings remai
 | `tests/integration/`                          | Local HTTP, cache, retry, discovery, filesystem, and end-to-end scanner tests.                              |
 | `docs/`                                       | Architecture, configuration, security, operations, development, testing, decisions, code map, and evidence. |
 
-Generated `dist/` is committed because JavaScript Actions must provide a runnable bundle. Coverage, reports, caches, benchmark fixtures, and package tarballs are not committed.
+Generated `dist/` is committed because JavaScript Actions must provide a runnable bundle. The Action uses CommonJS for compatibility with the current `@actions/core` dependency graph while the CLI/library remain ESM. Coverage, reports, caches, benchmark fixtures, and package tarballs are not committed.
 
 ## Security and limitations
 
