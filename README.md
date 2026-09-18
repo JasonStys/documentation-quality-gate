@@ -229,6 +229,7 @@ See [SECURITY.md](SECURITY.md), [docs/security.md](docs/security.md), and [docs/
 - [Architecture decision records](docs/adr/0001-deterministic-fact-model.md)
 - [Verification evidence](docs/reports/verification.md)
 - [Benchmark evidence](docs/reports/benchmark.md)
+- [Latest maintenance audit](docs/reports/maintenance-audit-2026-09-18.md)
 
 ## License
 
