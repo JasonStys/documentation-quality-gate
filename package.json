@@ -57,13 +57,13 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@types/node": "22.20.3",
+    "@types/node": "22.20.4",
     "@types/unist": "3.0.3",
     "@vitest/coverage-v8": "5.0.1",
     "esbuild": "0.28.2",
-    "eslint": "10.10.0",
-    "prettier": "3.9.6",
-    "tsx": "4.23.13",
+    "eslint": "10.11.0",
+    "prettier": "3.9.8",
+    "tsx": "4.23.15",
     "typescript": "5.9.3",
     "typescript-eslint": "8.70.0",
     "vitest": "5.0.1"
