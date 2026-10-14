@@ -33,9 +33,16 @@ The expanded suite has 27 unique tests (including seven integration cases),
 94.63% statement coverage and 78.23% branch coverage. Package verification also
 exercises standalone pass/fail fixtures and all three output formats without
 installed dependencies. The AST map verifies 598 declaration locations in 27 files.
-Native cross-platform CI and CodeQL results and run links will be appended after
-they pass. Raw account/log/archive
-data is kept private on the PC. This assessment is not a claim of perfect security.
+Native verification of source commit
+`3520924a1c0f61ebe0be4aaef1778417f41e972e` passed:
+[four-platform/runtime CI lanes](https://github.com/JasonStys/documentation-quality-gate/actions/runs/38643589980),
+[CodeQL](https://github.com/JasonStys/documentation-quality-gate/actions/runs/38643589998)
+and [the repository's own bundled Action](https://github.com/JasonStys/documentation-quality-gate/actions/runs/38643589959).
+The CI matrix covers Linux and Windows with Node 22 and 24; it is not four
+distinct operating systems. A fresh CodeQL API query found zero open alerts.
+Raw account/log/archive data is kept private on the PC. This assessment is not
+a claim of perfect security. Superseded run links may be removed by an approved
+cleanup; verified evidence remains in the private local archive.
 
 Follow-up native verification exposed an ESM/CJS dependency entry mismatch in
 the standalone Action (run 38641400711). The builder selects the static CJS
