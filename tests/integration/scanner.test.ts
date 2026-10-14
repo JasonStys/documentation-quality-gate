@@ -13,6 +13,26 @@ import { scanRepository } from '../../src/scanner.js';
 import { createTemporaryRepository } from '../helpers.js';
 
 describe('repository scanner', () => {
+  it('does not validate source-file fragments against the referring document', async () => {
+    const repository = await createTemporaryRepository();
+    try {
+      await repository.write(
+        '.docquality.json',
+        JSON.stringify({ include: ['docs/**/*.md'] }),
+      );
+      await repository.write('code.ts', '// Source line');
+      await repository.write(
+        'docs/guide.md',
+        '---\ntitle: Guide\n---\n# Guide\n[Source](../code.ts#L1)\n[Missing](#absent)\n',
+      );
+      const result = await scanRepository({ rootDirectory: repository.root });
+      const brokenLinks = result.diagnostics.filter((item) => item.ruleId === 'DQ005');
+      expect(brokenLinks).toHaveLength(1);
+      expect(brokenLinks[0]?.message).toContain('#absent');
+    } finally {
+      await repository.cleanup();
+    }
+  });
   it('does not traverse directory links during file discovery', async () => {
     const repository = await createTemporaryRepository();
     try {

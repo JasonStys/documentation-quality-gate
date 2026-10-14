@@ -158,18 +158,20 @@ The baseline records exact fingerprints for current findings. New findings remai
 
 ## Commands
 
-| Command                 | Purpose                                                 |
-| ----------------------- | ------------------------------------------------------- |
-| `pnpm format:check`     | Verify deterministic formatting.                        |
-| `pnpm lint`             | Run strict type-aware ESLint.                           |
-| `pnpm typecheck`        | Compile-check source and tests without emitting.        |
-| `pnpm test`             | Run all tests with enforced coverage.                   |
-| `pnpm test:integration` | Run filesystem, HTTP, and scanner boundary tests.       |
-| `pnpm build`            | Compile the CLI/library and bundle the Node 24 Action.  |
-| `pnpm dogfood`          | Validate the representative example corpus.             |
-| `pnpm benchmark`        | Measure complete scans at 100, 1,000, and 10,000 pages. |
-| `pnpm verify`           | Run the complete local quality gate.                    |
-| `pnpm pack:artifact`    | Produce the installable npm tarball.                    |
+| Command                 | Purpose                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------- |
+| `pnpm format:check`     | Verify deterministic formatting.                                                 |
+| `pnpm lint`             | Run strict type-aware ESLint.                                                    |
+| `pnpm typecheck`        | Compile-check source and tests without emitting.                                 |
+| `pnpm test`             | Run all tests with enforced coverage.                                            |
+| `pnpm test:integration` | Run filesystem, HTTP, and scanner boundary tests.                                |
+| `pnpm build`            | Compile the CLI/library and bundle the Node 24 Action.                           |
+| `pnpm dogfood`          | Validate the representative example corpus.                                      |
+| `pnpm benchmark`        | Measure complete scans at 100, 1,000, and 10,000 pages.                          |
+| `pnpm verify`           | Run the complete local quality gate.                                             |
+| `pnpm code-map`         | Regenerate exact definition, parameter and variable locations from syntax trees. |
+| `pnpm code-map:check`   | Fail if the declaration map is stale.                                            |
+| `pnpm pack:artifact`    | Produce the installable npm tarball.                                             |
 
 ## Repository map
 
@@ -196,6 +198,8 @@ The baseline records exact fingerprints for current findings. New findings remai
 | `src/reporters.ts`                            | Console, JSON, SARIF, and escaped self-contained HTML reports.                                              |
 | `src/scanner.ts`                              | Bounded orchestration, parse-failure conversion, summaries, and thresholds.                                 |
 | `scripts/build-action.mjs`                    | Bundles the Action and dependencies into `dist/index.cjs`.                                                  |
+| `scripts/generate-code-map.mjs`               | Generates and checks exact declaration locations without executing source.                                  |
+| `tests/unit/bounded-file.test.ts`             | Regressions for descriptor growth, oversize inputs and guaranteed closure.                                  |
 | `scripts/benchmark.ts`                        | Generates and scans 100/1,000/10,000-page corpora.                                                          |
 | `scripts/clean.mjs`                           | Cross-platform generated-output cleanup.                                                                    |
 | `scripts/verify-package.mjs`                  | Verifies required consumer artifacts.                                                                       |

@@ -29,9 +29,29 @@ it is a reviewed patch selection, not an advisory suppression.
 Local Node 24.18.1 verification passed formatting, lint, types, unit/integration
 tests with the existing coverage thresholds, package/bundle construction and
 the demonstration corpus. The refreshed frozen graph has zero known advisories.
+The expanded suite has 27 unique tests (including seven integration cases),
+94.63% statement coverage and 78.23% branch coverage. Package verification also
+exercises standalone pass/fail fixtures and all three output formats without
+installed dependencies. The AST map verifies 598 declaration locations in 27 files.
 Native cross-platform CI and CodeQL results and run links will be appended after
 they pass. Raw account/log/archive
 data is kept private on the PC. This assessment is not a claim of perfect security.
+
+Follow-up native verification exposed an ESM/CJS dependency entry mismatch in
+the standalone Action (run 38641400711). The builder selects the static CJS
+dependency entry, and package verification now runs pass/fail fixtures in an
+isolated directory without node_modules and verifies all three report formats.
+The security-and-quality suite also found a stat/read path race: the reader now
+checks and reads the same open descriptor and caps actual bytes even if it grows.
+Regression tests prove growth rejection and guaranteed descriptor closure.
+The redundant metadata branch identified by CodeQL was removed without changing
+normal serialized values. No source-level query was disabled or alert dismissed.
+
+The generated declaration map is now AST-based and freshness-checked in CI.
+Link validation checks anchors only for parsed markup targets, rather than using
+the referring document's anchors for source-file links. Other existing targets
+receive existence checks only; code-line correctness is independently guaranteed
+for this repository by its declaration-map generator, not by the general link checker.
 
 References: [CodeQL scan configuration](https://docs.github.com/en/code-security/reference/code-scanning/workflow-configuration-options),
 [braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm),

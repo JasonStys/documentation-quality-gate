@@ -5,6 +5,9 @@
  */
 import { build } from 'esbuild';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+
+const requireForBuild = createRequire(import.meta.url);
 
 await build({
   entryPoints: [path.resolve('src/action.ts')],
@@ -17,4 +20,7 @@ await build({
   target: 'node24',
   sourcemap: true,
   legalComments: 'none',
+  // The ESM entry uses import.meta/createRequire; select its static CJS entry
+  // so esbuild can include every dependency in the standalone Action bundle.
+  alias: { tinyglobby: requireForBuild.resolve('tinyglobby') },
 });

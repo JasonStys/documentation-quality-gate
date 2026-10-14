@@ -3,7 +3,7 @@
  * @description Loads configuration, parses bounded inputs, runs rules, applies governance, and computes exit policy.
  * @remarks Key declarations are listed in source order; verified locations live in docs/code-map.md.
  */
-import { readFile, stat } from 'node:fs/promises';
+import { open } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import path from 'node:path';
 import { loadConfiguration } from './config.js';
@@ -19,6 +19,34 @@ import { evaluateRules } from './rules.js';
 
 const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 
+/** Reads one open descriptor with a strict byte cap, even if the file grows. */
+export async function readBoundedDocument(absolutePath: string): Promise<string> {
+  const handle = await open(absolutePath, 'r');
+  try {
+    const details = await handle.stat();
+    if (!details.isFile() || details.size > MAX_DOCUMENT_BYTES) {
+      throw new Error(
+        `Document exceeds the ${MAX_DOCUMENT_BYTES}-byte input limit or is not a regular file.`,
+      );
+    }
+    const chunks: Buffer[] = [];
+    let total = 0;
+    while (total <= MAX_DOCUMENT_BYTES) {
+      const chunk = Buffer.alloc(Math.min(64 * 1024, MAX_DOCUMENT_BYTES + 1 - total));
+      const { bytesRead } = await handle.read(chunk, 0, chunk.length, null);
+      if (bytesRead === 0) break;
+      total += bytesRead;
+      if (total > MAX_DOCUMENT_BYTES) {
+        throw new Error(`Document exceeds the ${MAX_DOCUMENT_BYTES}-byte input limit.`);
+      }
+      chunks.push(chunk.subarray(0, bytesRead));
+    }
+    return Buffer.concat(chunks, total).toString('utf8');
+  } finally {
+    await handle.close();
+  }
+}
+
 /** Parses one bounded UTF-8 document or returns a precise parse diagnostic. */
 async function parseDocument(
   rootDirectory: string,
@@ -26,11 +54,7 @@ async function parseDocument(
 ): Promise<{ document?: DocumentFacts; diagnostic?: Diagnostic }> {
   const absolutePath = path.resolve(rootDirectory, relativePath);
   try {
-    const details = await stat(absolutePath);
-    if (details.size > MAX_DOCUMENT_BYTES) {
-      throw new Error(`Document exceeds the ${MAX_DOCUMENT_BYTES}-byte input limit.`);
-    }
-    const source = await readFile(absolutePath, 'utf8');
+    const source = await readBoundedDocument(absolutePath);
     const document = /\.html?$/i.test(relativePath)
       ? parseHtmlDocument(absolutePath, relativePath, source)
       : parseMarkdownDocument(absolutePath, relativePath, source);

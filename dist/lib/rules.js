@@ -111,11 +111,8 @@ function displayValue(value) {
         typeof value === 'bigint') {
         return String(value);
     }
-    if (value === null || value === undefined) {
-        return String(value);
-    }
     try {
-        return JSON.stringify(value);
+        return JSON.stringify(value) ?? '<non-serializable value>';
     }
     catch {
         return '<non-serializable value>';
@@ -168,7 +165,10 @@ async function evaluateLocalLinks(rootDirectory, document, documentsByPath) {
             diagnostics.push(documentDiagnostic(document, 'DQ005', 'error', `Local link target does not exist: ${rawFile}`, 'Create the target or update the relative path and preserve filename casing.', link.location));
             continue;
         }
-        if (rawAnchor !== undefined) {
+        // Only a parsed target (or this document) has known markup anchors.
+        // Code-file #L links and out-of-scope documents get existence checks only.
+        if (rawAnchor !== undefined &&
+            (rawFile.length === 0 || targetDocument !== undefined)) {
             const anchor = decodePath(rawAnchor);
             const anchors = targetDocument?.anchors ?? document.anchors;
             if (!anchors.has(anchor)) {

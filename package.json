@@ -31,6 +31,8 @@
     "benchmark": "tsx scripts/benchmark.ts",
     "build": "pnpm clean && tsc -p tsconfig.build.json && node scripts/build-action.mjs",
     "clean": "node scripts/clean.mjs",
+    "code-map": "node scripts/generate-code-map.mjs",
+    "code-map:check": "node scripts/generate-code-map.mjs --check",
     "dogfood": "tsx src/cli.ts examples/valid --config examples/valid/.docquality.json --output-dir artifacts/dogfood",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -39,7 +41,7 @@
     "test": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.mts",
     "typecheck": "tsc --noEmit",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm dogfood && node scripts/verify-package.mjs"
+    "verify": "pnpm format:check && pnpm code-map:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm dogfood && node scripts/verify-package.mjs"
   },
   "dependencies": {
     "@actions/core": "3.0.1",
