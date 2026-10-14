@@ -3,13 +3,57 @@
  * @description Exercises discovery, parsing, cross-file rules, governance, report writing, and failure thresholds.
  * @remarks Key declarations are listed in source order; verified locations live in docs/code-map.md.
  */
-import { readFile } from 'node:fs/promises';
+import { readFile, symlink } from 'node:fs/promises';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { writeReports } from '../../src/reporters.js';
+import { parseConfiguration } from '../../src/config.js';
+import { discoverFiles } from '../../src/discovery.js';
 import { scanRepository } from '../../src/scanner.js';
 import { createTemporaryRepository } from '../helpers.js';
 
 describe('repository scanner', () => {
+  it('does not traverse directory links during file discovery', async () => {
+    const repository = await createTemporaryRepository();
+    try {
+      await repository.write('docs/guide.md', '# Guide');
+      await symlink(
+        path.join(repository.root, 'docs'),
+        path.join(repository.root, 'alias'),
+        process.platform === 'win32' ? 'junction' : 'dir',
+      );
+      expect(await discoverFiles(repository.root, parseConfiguration({}))).toEqual([
+        'docs/guide.md',
+      ]);
+    } finally {
+      await repository.cleanup();
+    }
+  });
+  it('preserves dotfiles, brace patterns, ignores, deduplication and path scopes', async () => {
+    const repository = await createTemporaryRepository();
+    try {
+      await repository.write('.hidden.md', '# Hidden');
+      await repository.write('docs/a.md', '# A');
+      await repository.write('docs/b.html', '<h1>B</h1>');
+      await repository.write('docs/not-selected.txt', 'Not a supported document');
+      await repository.write('ignored/private.md', '# Excluded');
+      const configuration = parseConfiguration({
+        include: ['**/*.{md,html}', 'docs/**/*.md'],
+        exclude: ['ignored/**'],
+      });
+      expect(await discoverFiles(repository.root, configuration)).toEqual([
+        '.hidden.md',
+        'docs/a.md',
+        'docs/b.html',
+      ]);
+      expect(await discoverFiles(repository.root, configuration, ['docs'])).toEqual([
+        'docs/a.md',
+        'docs/b.html',
+      ]);
+    } finally {
+      await repository.cleanup();
+    }
+  });
   it('passes a valid scoped repository and writes reports', async () => {
     const repository = await createTemporaryRepository();
     try {

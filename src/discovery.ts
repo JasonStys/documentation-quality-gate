@@ -6,7 +6,7 @@
 import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
-import fastGlob from 'fast-glob';
+import { glob } from 'tinyglobby';
 import type { QualityConfiguration } from './model.js';
 
 const execFileAsync = promisify(execFile);
@@ -43,21 +43,20 @@ export async function discoverFiles(
   paths: readonly string[] = ['.'],
   changedFrom?: string,
 ): Promise<string[]> {
-  const candidates = await fastGlob([...configuration.include], {
+  const candidates = await glob([...configuration.include], {
     absolute: false,
     cwd: rootDirectory,
     dot: true,
     followSymbolicLinks: false,
     ignore: [...configuration.exclude],
     onlyFiles: true,
-    unique: true,
   });
   const scopes = paths
     .map((item) => normalizeRelative(path.normalize(item)))
     .map((item) => (item === '.' ? '' : item.replace(/\/$/, '')));
   const changed =
     changedFrom === undefined ? null : await changedFiles(rootDirectory, changedFrom);
-  return candidates
+  return [...new Set(candidates)]
     .map(normalizeRelative)
     .filter((candidate) =>
       scopes.some(

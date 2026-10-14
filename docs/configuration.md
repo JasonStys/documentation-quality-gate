@@ -14,17 +14,23 @@ Unknown keys are rejected so misspelled policy does not silently disappear.
 
 ## Fields
 
-| Field              | Type                                 | Default                          | Meaning                                       |
-| ------------------ | ------------------------------------ | -------------------------------- | --------------------------------------------- |
-| `include`          | String array                         | `**/*.{md,html}`                 | Fast-glob patterns relative to the scan root. |
-| `exclude`          | String array                         | Generated/dependency directories | Files removed before parsing.                 |
-| `failOn`           | `error`, `warning`, `notice`, `none` | `error`                          | Lowest active severity that produces failure. |
-| `requiredMetadata` | String array                         | `title`                          | YAML front-matter keys required for Markdown. |
-| `baselineFile`     | String                               | `.docquality-baseline.json`      | Reviewed diagnostic fingerprints.             |
-| `externalLinks`    | Object                               | Disabled                         | Bounded public-network policy.                |
-| `suppressions`     | Object array                         | Empty                            | Explicit scoped exceptions.                   |
+| Field              | Type                                 | Default                          | Meaning                                        |
+| ------------------ | ------------------------------------ | -------------------------------- | ---------------------------------------------- |
+| `include`          | String array                         | `**/*.{md,html}`                 | Tinyglobby patterns relative to the scan root. |
+| `exclude`          | String array                         | Generated/dependency directories | Files removed before parsing.                  |
+| `failOn`           | `error`, `warning`, `notice`, `none` | `error`                          | Lowest active severity that produces failure.  |
+| `requiredMetadata` | String array                         | `title`                          | YAML front-matter keys required for Markdown.  |
+| `baselineFile`     | String                               | `.docquality-baseline.json`      | Reviewed diagnostic fingerprints.              |
+| `externalLinks`    | Object                               | Disabled                         | Bounded public-network policy.                 |
+| `suppressions`     | Object array                         | Empty                            | Explicit scoped exceptions.                    |
 
 ## External links
+
+Both `include` and `exclude` allow at most 128 patterns, each trimmed and limited
+to 4,096 characters and 32 nested glob delimiters. These conservative limits
+are checked before discovery. Duplicate matches are removed, hidden documents
+remain eligible, ignored paths remain excluded and directory symlinks are not
+followed. Invalid configuration fails explicitly rather than silently skipping.
 
 | Field               | Bounds     | Purpose                                         |
 | ------------------- | ---------- | ----------------------------------------------- |

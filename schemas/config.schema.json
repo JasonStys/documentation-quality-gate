@@ -9,12 +9,15 @@
     "include": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 },
+      "maxItems": 128,
+      "items": { "type": "string", "minLength": 1, "maxLength": 4096 },
+      "description": "Glob patterns; the runtime also limits nested delimiters to depth 32.",
       "default": ["**/*.{md,html}"]
     },
     "exclude": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 },
+      "maxItems": 128,
+      "items": { "type": "string", "minLength": 1, "maxLength": 4096 },
       "default": ["node_modules/**", "dist/**", "coverage/**"]
     },
     "failOn": {

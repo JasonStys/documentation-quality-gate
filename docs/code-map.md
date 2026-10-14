@@ -19,20 +19,21 @@ Line locations are verified against version 1.0.0 source after formatting. They 
 
 ## Configuration, discovery, and governance
 
-| File                | Declaration             |  Line | Inputs and variables used                                      |
-| ------------------- | ----------------------- | ----: | -------------------------------------------------------------- |
-| `src/config.ts`     | Schema constants        | 11–42 | Severity, external-link, suppression, and root schemas.        |
-| `src/config.ts`     | `formatValidationError` |    58 | Zod issues and stable field paths.                             |
-| `src/config.ts`     | `parseConfiguration`    |    65 | Unknown value and validated result.                            |
-| `src/config.ts`     | `loadConfiguration`     |    76 | Root/config path, source JSON, filesystem errors.              |
-| `src/discovery.ts`  | `execFileAsync`         |    12 | Promisified argument-array Git execution.                      |
-| `src/discovery.ts`  | `normalizeRelative`     |    15 | Platform path separators.                                      |
-| `src/discovery.ts`  | `changedFiles`          |    20 | Root, revision, Git stdout, changed-path set.                  |
-| `src/discovery.ts`  | `discoverFiles`         |    40 | Globs, ignores, scopes, optional changed set, candidates.      |
-| `src/governance.ts` | `loadBaseline`          |    19 | Root, baseline path, parsed entries, fingerprint set.          |
-| `src/governance.ts` | `matchesSuppression`    |    57 | Diagnostic and scoped suppression.                             |
-| `src/governance.ts` | `applyGovernance`       |    69 | Baseline, date, active/expired suppressions, governed results. |
-| `src/governance.ts` | `writeBaselineFile`     |   117 | Scan result, destination, versioned entries.                   |
+| File                | Declaration             |  Line | Inputs and variables used                                             |
+| ------------------- | ----------------------- | ----: | --------------------------------------------------------------------- |
+| `src/config.ts`     | Schema constants        | 11–80 | Severity, bounded glob, external-link, suppression and root schemas.  |
+| `src/config.ts`     | `boundedGlob`           |    14 | `value`; stack at 16, character at 17, closing-delimiter index at 22. |
+| `src/config.ts`     | `formatValidationError` |    82 | Zod issues and stable field paths.                                    |
+| `src/config.ts`     | `parseConfiguration`    |    89 | Unknown value and validated result.                                   |
+| `src/config.ts`     | `loadConfiguration`     |   100 | Root/config path, source JSON, filesystem errors.                     |
+| `src/discovery.ts`  | `execFileAsync`         |    12 | Promisified argument-array Git execution.                             |
+| `src/discovery.ts`  | `normalizeRelative`     |    15 | Platform path separators.                                             |
+| `src/discovery.ts`  | `changedFiles`          |    20 | Root, revision, Git stdout, changed-path set.                         |
+| `src/discovery.ts`  | `discoverFiles`         |    40 | Globs, ignores, scopes, optional changed set, candidates.             |
+| `src/governance.ts` | `loadBaseline`          |    19 | Root, baseline path, parsed entries, fingerprint set.                 |
+| `src/governance.ts` | `matchesSuppression`    |    57 | Diagnostic and scoped suppression.                                    |
+| `src/governance.ts` | `applyGovernance`       |    69 | Baseline, date, active/expired suppressions, governed results.        |
+| `src/governance.ts` | `writeBaselineFile`     |   117 | Scan result, destination, versioned entries.                          |
 
 ## Parsing and rules
 

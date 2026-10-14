@@ -7,6 +7,31 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
 const severitySchema = z.enum(['error', 'warning', 'notice', 'none']);
+/** Limits configured glob work before invoking the glob parser; value is data. */
+function boundedGlob(value) {
+    if (value.length > 4096)
+        return false;
+    const stack = [];
+    for (const character of value) {
+        if ('{[('.includes(character)) {
+            stack.push(character);
+            if (stack.length > 32)
+                return false;
+        }
+        else {
+            const closing = '}])'.indexOf(character);
+            if (closing >= 0 && stack.at(-1) === '{[('[closing])
+                stack.pop();
+        }
+    }
+    return true;
+}
+const globSchema = z
+    .string()
+    .trim()
+    .min(1)
+    .max(4096)
+    .refine(boundedGlob, 'Glob nesting exceeds the supported depth of 32');
 const externalLinkSchema = z
     .object({
     enabled: z.boolean().default(false),
@@ -37,9 +62,10 @@ const suppressionSchema = z
 const configurationSchema = z
     .object({
     $schema: z.string().optional(),
-    include: z.array(z.string().trim().min(1)).min(1).default(['**/*.{md,html}']),
+    include: z.array(globSchema).min(1).max(128).default(['**/*.{md,html}']),
     exclude: z
-        .array(z.string().trim().min(1))
+        .array(globSchema)
+        .max(128)
         .default(['node_modules/**', 'dist/**', 'coverage/**']),
     failOn: severitySchema.default('error'),
     requiredMetadata: z.array(z.string().trim().min(1)).default(['title']),

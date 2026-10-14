@@ -8,6 +8,18 @@ import { loadConfiguration, parseConfiguration } from '../../src/config.js';
 import { createTemporaryRepository } from '../helpers.js';
 
 describe('configuration', () => {
+  it('bounds glob length, nesting and pattern count before discovery', () => {
+    expect(() => parseConfiguration({ include: ['a'.repeat(4097)] })).toThrow();
+    expect(() =>
+      parseConfiguration({ include: ['{'.repeat(33) + 'a' + '}'.repeat(33)] }),
+    ).toThrow(/nesting/i);
+    expect(() =>
+      parseConfiguration({ exclude: Array.from({ length: 129 }, () => '*.md') }),
+    ).toThrow();
+    expect(parseConfiguration({ include: ['**/*.{md,html}'] }).include).toEqual([
+      '**/*.{md,html}',
+    ]);
+  });
   it('applies secure defaults', () => {
     const configuration = parseConfiguration({});
     expect(configuration.failOn).toBe('error');
@@ -58,5 +70,17 @@ describe('configuration', () => {
     } finally {
       await repository.cleanup();
     }
+  });
+
+  it('treats source-like values as data, not schema or code', () => {
+    const configuration = parseConfiguration({
+      requiredMetadata: ['"; throw new Error("not executable"); //'],
+    });
+    expect(configuration.requiredMetadata).toEqual([
+      '"; throw new Error("not executable"); //',
+    ]);
+    expect(() =>
+      parseConfiguration({ '"; throw new Error("unexpected"); //': true }),
+    ).toThrow(/unrecognized key/i);
   });
 });

@@ -178,6 +178,8 @@ The baseline records exact fingerprints for current findings. New findings remai
 | `.github/workflows/ci.yml`                    | Cross-platform Node 22/24 verification, packaging, and evidence upload.                                     |
 | `.github/workflows/documentation-quality.yml` | Runs this repository's own bundled Action and uploads SARIF/report artifacts.                               |
 | `.github/workflows/codeql.yml`                | JavaScript/TypeScript security analysis.                                                                    |
+| `.github/codeql.yml`                          | Analysis scope: excludes generated duplicate bundles, retains authored code.                                |
+| `docs/reports/actions-review-2026-10-14.md`   | Evidence-based alert triage, dependency fixes and validation results.                                       |
 | `.github/dependabot.yml`                      | Weekly npm and Actions dependency review.                                                                   |
 | `action.yml`                                  | Node 24 Action inputs, outputs, branding, and entry point.                                                  |
 | `src/action.ts`                               | Workflow annotations, step summary, report outputs, and failure policy.                                     |

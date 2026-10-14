@@ -1,0 +1,5 @@
+# File: Exclude only reproducible dist output; authored source remains analyzed.
+# Rationale: docs/reports/actions-review-2026-10-14.md documents the three vendor alerts.
+name: Authored documentation-quality sources
+paths-ignore:
+  - dist/**
