@@ -72,6 +72,8 @@ Documentation failures are often semantic rather than cosmetic: the wrong firmwa
 - Validates JSON examples without running arbitrary code.
 - Makes external-link checks opt-in, cached, retried, rate-bounded, and private-host blocked by default.
 - Supports severity gates, changed-file mode, explicit baselines, path/line suppressions, rationales, and expiry.
+- Reviews new, persistent, not-reproduced and unexamined documentation debt with exact file/line references in JSON, HTML, console and Action summaries.
+- Refreshes accepted debt atomically with stale-scan and concurrent-writer refusal; partial scans retain unexamined findings.
 - Produces GitHub annotations and SARIF with deterministic fingerprints.
 - Runs on Windows and Linux with Node.js 22 and 24.
 - Dogfoods the packaged Action against this repository and publishes evidence artifacts.
@@ -154,7 +156,9 @@ Generate a baseline only after review:
 node dist/lib/cli.js . --write-baseline
 ```
 
-The baseline records exact fingerprints for current findings. New findings remain visible. Prefer fixing issues; when an exception is necessary, use a narrow rule/path/line suppression with an owner-readable rationale and expiry. Expired suppressions fail with `DQ000`.
+The review report records **new**, **persistent**, **not-reproduced** and **unexamined** findings. Default scans never change the baseline. Inspect the JSON/HTML review first, then use `--write-baseline` deliberately to accept new findings and refresh debt. Refresh retains persistent and unexamined entries; findings absent from successfully parsed files can be removed. This fixes repeated-refresh debt loss and protects findings outside a changed-file scan.
+
+Not-reproduced means absent under the current configuration, not proven fixed. Deleted, excluded or unreadable files remain unexamined. Fingerprints include the exact line, so moving an issue creates a new fingerprint. New findings remain visible. Prefer fixing issues; when an exception is necessary, use a narrow rule/path/line suppression with an owner-readable rationale and expiry. Expired suppressions fail with `DQ000`.
 
 ## Commands
 
@@ -175,40 +179,42 @@ The baseline records exact fingerprints for current findings. New findings remai
 
 ## Repository map
 
-| Path                                          | Summary                                                                                                     |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `.github/workflows/ci.yml`                    | Cross-platform Node 22/24 verification, packaging, and evidence upload.                                     |
-| `.github/workflows/documentation-quality.yml` | Runs this repository's own bundled Action and uploads SARIF/report artifacts.                               |
-| `.github/workflows/codeql.yml`                | JavaScript/TypeScript security analysis.                                                                    |
-| `.github/codeql.yml`                          | Analysis scope: excludes generated duplicate bundles, retains authored code.                                |
-| `docs/reports/actions-review-2026-10-14.md`   | Evidence-based alert triage, dependency fixes and validation results.                                       |
-| `.github/dependabot.yml`                      | Weekly npm and Actions dependency review.                                                                   |
-| `action.yml`                                  | Node 24 Action inputs, outputs, branding, and entry point.                                                  |
-| `src/action.ts`                               | Workflow annotations, step summary, report outputs, and failure policy.                                     |
-| `src/cli.ts`                                  | CLI options, scanning, report generation, and baseline creation.                                            |
-| `src/config.ts`                               | Strict JSON configuration parsing and safe defaults.                                                        |
-| `src/diagnostics.ts`                          | Immutable diagnostic construction and fingerprints.                                                         |
-| `src/discovery.ts`                            | Glob discovery, path scoping, and safe argument-array Git changed-file selection.                           |
-| `src/external-links.ts`                       | Optional DNS-aware, cached, retrying, bounded HTTP checks.                                                  |
-| `src/governance.ts`                           | Baselines, scoped suppressions, rationales, and expiry enforcement.                                         |
-| `src/model.ts`                                | Shared configuration, fact, diagnostic, and report types.                                                   |
-| `src/parsers/markdown.ts`                     | Markdown/GFM/front-matter fact extraction.                                                                  |
-| `src/parsers/html.ts`                         | HTML structure and static accessibility fact extraction.                                                    |
-| `src/rules.ts`                                | Rule catalog and deterministic evaluation.                                                                  |
-| `src/reporters.ts`                            | Console, JSON, SARIF, and escaped self-contained HTML reports.                                              |
-| `src/scanner.ts`                              | Bounded orchestration, parse-failure conversion, summaries, and thresholds.                                 |
-| `scripts/build-action.mjs`                    | Bundles the Action and dependencies into `dist/index.cjs`.                                                  |
-| `scripts/generate-code-map.mjs`               | Generates and checks exact declaration locations without executing source.                                  |
-| `tests/unit/bounded-file.test.ts`             | Regressions for descriptor growth, oversize inputs and guaranteed closure.                                  |
-| `scripts/benchmark.ts`                        | Generates and scans 100/1,000/10,000-page corpora.                                                          |
-| `scripts/clean.mjs`                           | Cross-platform generated-output cleanup.                                                                    |
-| `scripts/verify-package.mjs`                  | Verifies required consumer artifacts.                                                                       |
-| `schemas/config.schema.json`                  | Editor-friendly configuration JSON Schema.                                                                  |
-| `schemas/report.schema.json`                  | Versioned JSON report contract.                                                                             |
-| `examples/valid/`                             | Passing Markdown/HTML corpus and configuration.                                                             |
-| `tests/unit/`                                 | Fast parser, rule, governance, configuration, and reporter tests.                                           |
-| `tests/integration/`                          | Local HTTP, cache, retry, discovery, filesystem, and end-to-end scanner tests.                              |
-| `docs/`                                       | Architecture, configuration, security, operations, development, testing, decisions, code map, and evidence. |
+| Path                                          | Summary                                                                                                      |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `.github/workflows/ci.yml`                    | Cross-platform Node 22/24 verification, packaging, and evidence upload.                                      |
+| `.github/workflows/documentation-quality.yml` | Runs this repository's own bundled Action and uploads SARIF/report artifacts.                                |
+| `.github/workflows/codeql.yml`                | JavaScript/TypeScript security analysis.                                                                     |
+| `.github/codeql.yml`                          | Analysis scope: excludes generated duplicate bundles, retains authored code.                                 |
+| `docs/reports/actions-review-2026-10-14.md`   | Evidence-based alert triage, dependency fixes and validation results.                                        |
+| `.github/dependabot.yml`                      | Weekly npm and Actions dependency review.                                                                    |
+| `action.yml`                                  | Node 24 Action inputs, outputs, branding, and entry point.                                                   |
+| `src/action.ts`                               | Workflow annotations, step summary, report outputs, and failure policy.                                      |
+| `src/cli.ts`                                  | CLI options, scanning, report generation, and baseline creation.                                             |
+| `src/config.ts`                               | Strict JSON configuration parsing and safe defaults.                                                         |
+| `src/diagnostics.ts`                          | Immutable diagnostic construction and fingerprints.                                                          |
+| `src/discovery.ts`                            | Glob discovery, path scoping, and safe argument-array Git changed-file selection.                            |
+| `src/external-links.ts`                       | Optional DNS-aware, cached, retrying, bounded HTTP checks.                                                   |
+| `src/baseline.ts`                             | Strict bounded snapshots, honest baseline review, explicit atomic refresh and stale/concurrent-write guards. |
+| `src/governance.ts`                           | Baselines, scoped suppressions, rationales, and expiry enforcement.                                          |
+| `src/model.ts`                                | Shared configuration, fact, diagnostic, and report types.                                                    |
+| `src/parsers/markdown.ts`                     | Markdown/GFM/front-matter fact extraction.                                                                   |
+| `src/parsers/html.ts`                         | HTML structure and static accessibility fact extraction.                                                     |
+| `src/rules.ts`                                | Rule catalog and deterministic evaluation.                                                                   |
+| `src/reporters.ts`                            | Console, JSON, SARIF, and escaped self-contained HTML reports.                                               |
+| `src/scanner.ts`                              | Bounded orchestration, parse-failure conversion, summaries, and thresholds.                                  |
+| `scripts/build-action.mjs`                    | Bundles the Action and dependencies into `dist/index.cjs`.                                                   |
+| `scripts/generate-code-map.mjs`               | Generates and checks exact declaration locations without executing source.                                   |
+| `tests/unit/bounded-file.test.ts`             | Regressions for descriptor growth, oversize inputs and guaranteed closure.                                   |
+| `scripts/benchmark.ts`                        | Generates and scans 100/1,000/10,000-page corpora.                                                           |
+| `scripts/clean.mjs`                           | Cross-platform generated-output cleanup.                                                                     |
+| `scripts/verify-package.mjs`                  | Verifies required consumer artifacts.                                                                        |
+| `schemas/config.schema.json`                  | Editor-friendly configuration JSON Schema.                                                                   |
+| `schemas/report.schema.json`                  | Versioned JSON report contract.                                                                              |
+| `examples/valid/`                             | Passing Markdown/HTML corpus and configuration.                                                              |
+| `tests/unit/`                                 | Fast parser, rule, governance, configuration, and reporter tests.                                            |
+| `tests/integration/baseline-review.test.ts`   | Documentation-owner journeys for refresh, partial scans, limits, stale leases and exact review reports.      |
+| `tests/integration/`                          | Local HTTP, cache, retry, discovery, filesystem, and end-to-end scanner tests.                               |
+| `docs/`                                       | Architecture, configuration, security, operations, development, testing, decisions, code map, and evidence.  |
 
 Generated `dist/` is committed because JavaScript Actions must provide a runnable bundle. The Action uses CommonJS for compatibility with the current `@actions/core` dependency graph while the CLI/library remain ESM. Coverage, reports, caches, benchmark fixtures, and package tarballs are not committed.
 

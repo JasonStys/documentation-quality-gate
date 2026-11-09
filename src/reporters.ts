@@ -30,6 +30,18 @@ export function renderConsole(result: ScanResult): string {
   lines.push(
     `Scanned ${result.summary.files} files: ${result.summary.errors} errors, ${result.summary.warnings} warnings, ${result.summary.notices} notices, ${result.summary.suppressed} suppressed (${result.summary.durationMs} ms).`,
   );
+  if (result.baselineReview) {
+    const counts = Object.fromEntries(
+      ['new', 'persistent', 'not-reproduced', 'unexamined'].map((state) => [
+        state,
+        result.baselineReview?.entries.filter((entry) => entry.state === state).length ??
+          0,
+      ]),
+    );
+    lines.push(
+      `Baseline review: ${JSON.stringify(counts)}. Not-reproduced is not proof of a fix; unexamined debt is retained.`,
+    );
+  }
   return `${lines.join('\n')}\n`;
 }
 
@@ -41,6 +53,7 @@ export function createJsonReport(result: ScanResult): object {
     summary: result.summary,
     failed: result.failed,
     diagnostics: result.diagnostics,
+    ...(result.baselineReview ? { baselineReview: result.baselineReview } : {}),
   };
 }
 
@@ -113,6 +126,13 @@ export function createHtmlReport(result: ScanResult): string {
         </tr>`,
     )
     .join('');
+  const review = result.baselineReview;
+  const reviewHtml = review
+    ? `<section aria-label="Baseline review"><h2>Review accepted documentation debt</h2>
+    <p>Current configuration: <code>${review.configurationSha256}</code>. Successfully parsed files: ${review.successfullyScannedFiles.length}.</p>
+    <p>Not-reproduced means absent under this configuration, not proven fixed. Unexamined includes excluded, missing and unreadable files. Line moves create a new fingerprint. Refresh is an explicit acceptance of new findings; configured temporary exceptions do not become new baseline debt.</p>
+    <p>Scroll the comparison table horizontally on narrow screens.</p><div class="table-scroll" role="region" aria-label="Scrollable debt comparison" tabindex="0"><table><caption>Baseline changes and retained debt</caption><thead><tr><th scope="col">State</th><th scope="col">Location</th><th scope="col">Rule</th><th scope="col">Reason</th></tr></thead><tbody>${review.entries.map((entry) => `<tr><td>${entry.state}</td><td><code>${escapeHtml(entry.path)}:${entry.line}</code></td><td>${entry.ruleId}</td><td>${escapeHtml(entry.reason)}</td></tr>`).join('') || '<tr><td colspan="4">No baseline findings.</td></tr>'}</tbody></table></div></section>`
+    : '';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -121,8 +141,10 @@ export function createHtmlReport(result: ScanResult): string {
   <title>Documentation quality report</title>
   <style>
     :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-    body { margin: 0 auto; max-width: 90rem; padding: 1.5rem; }
-    table { border-collapse: collapse; width: 100%; }
+    body { margin: 0 auto; max-width: 90rem; padding: 1.5rem; overflow-wrap: anywhere; }
+    table { border-collapse: collapse; width: 100%; min-width: 48rem; }
+    .table-scroll { overflow-x: auto; }
+    td, th { overflow-wrap: anywhere; }
     caption { font-size: 1.25rem; font-weight: 700; padding: 1rem 0; text-align: left; }
     th, td { border: 1px solid #7778; padding: .6rem; text-align: left; vertical-align: top; }
     th { background: #1769aa; color: white; }
@@ -142,11 +164,12 @@ export function createHtmlReport(result: ScanResult): string {
       <li><strong>${result.summary.notices}</strong> notices</li>
       <li><strong>${result.summary.suppressed}</strong> suppressed</li>
     </ul>
-    <table>
+    ${reviewHtml}
+    <div class="table-scroll" role="region" aria-label="Scrollable diagnostics" tabindex="0"><table>
       <caption>Diagnostics</caption>
       <thead><tr><th scope="col">Rule</th><th scope="col">Severity</th><th scope="col">Location</th><th scope="col">Finding and remediation</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="4">No diagnostics.</td></tr>'}</tbody>
-    </table>
+    </table></div>
   </main>
 </body>
 </html>

@@ -53,7 +53,7 @@ export function createProgram(): Command {
     )
     .option(
       '--write-baseline',
-      'write current unsuppressed findings to the configured baseline',
+      'explicitly accept new findings and refresh reviewed debt; retain unexamined files',
       false,
     );
 }

@@ -37,3 +37,7 @@ The suite enforces at least 88% statements/lines, 85% functions, and 75% branche
 ## Known gaps
 
 Static HTML analysis does not replace a rendered-browser accessibility campaign. The project intentionally does not execute code examples; a future opt-in executor would require allowlisted toolchains, containers, strict resources, and an untrusted-content threat review.
+
+## Baseline review journeys
+
+`tests/integration/baseline-review.test.ts` uses synthetic Markdown and real temporary files to verify repeated refresh, exact new/persistent/moved-line review, partial-scan preservation, oversize parse failures, temporary waivers, unhideable operational errors, stale-content and concurrent-lease refusal, duplicate/conflicting metadata, malformed UTF-8, traversal/symlink bounds, and escaped reports. No report claims an unexamined file is fixed. The standalone Action package test runs with no `node_modules` and checks new debt, manually accepted persistent debt, Action summary and parse-failure enforcement.

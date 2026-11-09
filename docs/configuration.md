@@ -65,7 +65,22 @@ On or after review, remove the exception or set a new date deliberately. An expi
 node dist/lib/cli.js . --write-baseline
 ```
 
-Review the generated file before committing it. Fingerprints include rule, file, line, and message, so a baseline cannot hide a different issue merely because it shares a rule ID.
+First run without `--write-baseline` and inspect `documentation-quality.html` or the JSON `baselineReview`. The Action also summarizes the four states without mutating the baseline:
+
+| State          | What the scan established                                                                    | Explicit refresh behavior                          |
+| -------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| New            | Current eligible fingerprint absent from the baseline.                                       | Accept unless temporarily waived by configuration. |
+| Persistent     | Same fingerprint and exact identity reproduced.                                              | Retain, including already accepted debt.           |
+| Not-reproduced | Successfully parsed file did not reproduce this fingerprint under the current configuration. | Remove after operator review.                      |
+| Unexamined     | File missing, excluded, outside selected scope or unreadable.                                | Retain.                                            |
+
+Not-reproduced is **not proof of a fix**: configuration, enabled network checks and line numbers affect findings. Review records the current configuration SHA-256 and successfully parsed paths. Existing fingerprints remain line-sensitive; line moves are new plus not-reproduced rather than guessed equivalences.
+
+`--write-baseline` explicitly accepts new findings, retains persistent/unexamined debt and prunes only not-reproduced entries. Review the generated file before committing it. A first accepting scan may still exit 1 because the report describes the pre-refresh policy; run again to validate the newly accepted baseline. Temporary configured exceptions are not added as new baseline debt. `DQ000` expiry and `DQ013` unreadable/parse errors are never suppressible or newly accepted into a baseline.
+
+Baseline files are capped at 2 MiB and 10,000 complete entries. Exact duplicate entries are deduplicated; conflicting metadata, invalid UTF-8, malformed entries and traversal paths fail explicitly. Targets must be inside the repository, with an existing parent and no target symlink. Refresh uses an exclusive adjacent `.lock`, a flushed temporary file, content-hash stale-scan checks and atomic replacement. It refuses stale or concurrent refreshes rather than overwriting another review. If a process is forcibly stopped, review/remove its stale lock yourself only after verifying no refresh is active. These guards coordinate this CLI, not arbitrary external writers; keep the working directory trusted.
+
+Fingerprints include rule, file, line, and message, so a baseline cannot hide a different issue merely because it shares a rule ID.
 
 ## Changed-file mode
 

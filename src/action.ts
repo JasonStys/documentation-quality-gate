@@ -91,6 +91,26 @@ export async function runAction(): Promise<void> {
         String(result.summary.suppressed),
       ],
     ]);
+    if (result.baselineReview) {
+      core.summary
+        .addHeading('Baseline review', 2)
+        .addTable([
+          [
+            { data: 'State', header: true },
+            { data: 'Findings', header: true },
+          ],
+          ...['new', 'persistent', 'not-reproduced', 'unexamined'].map((state) => [
+            state,
+            String(
+              result.baselineReview?.entries.filter((entry) => entry.state === state)
+                .length ?? 0,
+            ),
+          ]),
+        ])
+        .addRaw(
+          'Not-reproduced is not proof of a fix. Unexamined debt stays retained; review full JSON/HTML before explicit baseline refresh.',
+        );
+    }
     await core.summary.write();
     if (result.failed) {
       core.setFailed(

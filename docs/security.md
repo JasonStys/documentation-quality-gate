@@ -36,3 +36,7 @@ For contributions from forks, keep external-link checks disabled and run with `c
 ## Reporting vulnerabilities
 
 Follow [SECURITY.md](../SECURITY.md). Do not include credentials, private repository content, or exploit details in a public issue.
+
+## Baseline review boundary
+
+Baseline parsing is descriptor-bounded to 2 MiB and 10,000 complete entries with strict UTF-8. Paths are repository-local; target symlinks are refused. An explicit refresh is an acceptance operation and must be reviewed. It refuses a stale baseline content hash or an occupied adjacent lock, writes/flushed a unique temporary file and atomically replaces the reviewed baseline. External software that ignores the lock is outside the cooperative-writer guarantee; use a trusted checkout. Malformed baselines fail the scan instead of silently discarding entries. Expiry (`DQ000`) and input failure (`DQ013`) cannot be suppressed to turn an unreadable corpus into a passing scan.

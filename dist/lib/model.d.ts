@@ -116,6 +116,17 @@ export interface BaselineFile {
     readonly generatedAt: string;
     readonly entries: readonly BaselineEntry[];
 }
+export interface BaselineReviewEntry extends BaselineEntry {
+    readonly state: 'new' | 'persistent' | 'not-reproduced' | 'unexamined';
+    readonly reason: string;
+}
+export interface BaselineReview {
+    readonly baselineSha256: string | null;
+    readonly configurationSha256: string;
+    readonly successfullyScannedFiles: readonly string[];
+    readonly entries: readonly BaselineReviewEntry[];
+    readonly proposedEntries: readonly BaselineEntry[];
+}
 export interface ScanOptions {
     readonly rootDirectory: string;
     readonly paths?: readonly string[] | undefined;
@@ -139,6 +150,7 @@ export interface ScanResult {
     readonly diagnostics: readonly Diagnostic[];
     readonly summary: ScanSummary;
     readonly failed: boolean;
+    readonly baselineReview?: BaselineReview;
 }
 export interface ReporterPaths {
     readonly json: string;

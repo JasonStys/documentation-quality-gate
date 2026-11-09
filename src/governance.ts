@@ -3,54 +3,27 @@
  * @description Applies explicit, expiring exceptions while ensuring new diagnostics remain visible.
  * @remarks Key declarations are listed in source order; verified locations live in docs/code-map.md.
  */
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import { minimatch } from 'minimatch';
+import { baselineEligible, loadBaselineSnapshot, refreshBaseline } from './baseline.js';
+import type { BaselineSnapshot } from './baseline.js';
 import { createDiagnostic } from './diagnostics.js';
 import type {
-  BaselineFile,
   Diagnostic,
   QualityConfiguration,
   ScanResult,
   SuppressionConfiguration,
 } from './model.js';
 
-/** Loads and minimally validates a baseline, returning an empty set when it does not exist. */
+/** Loads a strictly validated baseline; missing files mean no accepted findings. */
 export async function loadBaseline(
   rootDirectory: string,
   baselineFile: string,
 ): Promise<ReadonlySet<string>> {
-  try {
-    const source = await readFile(path.resolve(rootDirectory, baselineFile), 'utf8');
-    const parsed = JSON.parse(source) as unknown;
-    if (
-      parsed === null ||
-      typeof parsed !== 'object' ||
-      !('version' in parsed) ||
-      parsed.version !== 1 ||
-      !('entries' in parsed) ||
-      !Array.isArray(parsed.entries)
-    ) {
-      throw new Error('Baseline must use version 1 and contain an entries array.');
-    }
-    return new Set(
-      parsed.entries
-        .map((entry: unknown) =>
-          entry !== null &&
-          typeof entry === 'object' &&
-          'fingerprint' in entry &&
-          typeof entry.fingerprint === 'string'
-            ? entry.fingerprint
-            : undefined,
-        )
-        .filter((value): value is string => typeof value === 'string'),
-    );
-  } catch (error: unknown) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return new Set();
-    }
-    throw new Error(`Unable to load baseline ${baselineFile}`, { cause: error });
-  }
+  return new Set(
+    (await loadBaselineSnapshot(rootDirectory, baselineFile)).entries.map(
+      (entry) => entry.fingerprint,
+    ),
+  );
 }
 
 /** Determines whether a live suppression selects a diagnostic. */
@@ -71,8 +44,11 @@ export async function applyGovernance(
   diagnostics: readonly Diagnostic[],
   configuration: QualityConfiguration,
   now = new Date(),
+  snapshot?: BaselineSnapshot,
 ): Promise<Diagnostic[]> {
-  const baseline = await loadBaseline(rootDirectory, configuration.baselineFile);
+  const loaded =
+    snapshot ?? (await loadBaselineSnapshot(rootDirectory, configuration.baselineFile));
+  const baseline = new Map(loaded.entries.map((entry) => [entry.fingerprint, entry]));
   const today = now.toISOString().slice(0, 10);
   const expired = configuration.suppressions.filter(
     (suppression) => suppression.expires !== undefined && suppression.expires < today,
@@ -81,6 +57,7 @@ export async function applyGovernance(
     (suppression) => suppression.expires === undefined || suppression.expires >= today,
   );
   const governed = diagnostics.map((diagnostic) => {
+    if (!baselineEligible(diagnostic)) return diagnostic;
     const suppression = active.find((candidate) =>
       matchesSuppression(diagnostic, candidate),
     );
@@ -91,7 +68,17 @@ export async function applyGovernance(
         suppressionReason: `configured: ${suppression.rationale}`,
       };
     }
-    if (baseline.has(diagnostic.fingerprint)) {
+    const prior = baseline.get(diagnostic.fingerprint);
+    if (
+      prior &&
+      (prior.path !== diagnostic.file ||
+        prior.line !== diagnostic.location.line ||
+        prior.ruleId !== diagnostic.ruleId)
+    )
+      throw new Error(
+        'Baseline fingerprint metadata does not match the current finding.',
+      );
+    if (prior) {
       return { ...diagnostic, suppressed: true, suppressionReason: 'baseline' };
     }
     return diagnostic;
@@ -113,24 +100,10 @@ export async function applyGovernance(
   return governed;
 }
 
-/** Writes the current unsuppressed findings as an explicit versioned baseline. */
+/** Refreshes explicitly reviewed debt atomically without dropping findings outside this scan's scope. */
 export async function writeBaselineFile(
   result: ScanResult,
   destination = result.configuration.baselineFile,
 ): Promise<string> {
-  const absolutePath = path.resolve(result.rootDirectory, destination);
-  const baseline: BaselineFile = {
-    version: 1,
-    generatedAt: new Date().toISOString(),
-    entries: result.diagnostics
-      .filter((diagnostic) => !diagnostic.suppressed)
-      .map((diagnostic) => ({
-        fingerprint: diagnostic.fingerprint,
-        ruleId: diagnostic.ruleId,
-        path: diagnostic.file,
-        line: diagnostic.location.line,
-      })),
-  };
-  await writeFile(absolutePath, `${JSON.stringify(baseline, null, 2)}\n`, 'utf8');
-  return absolutePath;
+  return refreshBaseline(result, destination);
 }
