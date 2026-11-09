@@ -26,7 +26,7 @@ export function createProgram() {
         'notice',
         'none',
     ]))
-        .option('--write-baseline', 'write current unsuppressed findings to the configured baseline', false);
+        .option('--write-baseline', 'explicitly accept new findings and refresh reviewed debt; retain unexamined files', false);
 }
 /** Runs the CLI and returns the intended process exit code. */
 export async function runCli(arguments_, rootDirectory = process.cwd()) {

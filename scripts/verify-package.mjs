@@ -59,6 +59,55 @@ async function verifyStandaloneAction() {
       throw new Error('Standalone Action pass fixture failed.');
     await access(path.join(root, 'reports/documentation-quality.sarif'));
     await access(path.join(root, 'reports/documentation-quality.html'));
+    await writeFile(path.join(root, 'diagram.png'), 'Inert synthetic diagram fixture.');
+    await writeFile(
+      path.join(root, 'guide.md'),
+      '---\ntitle: Smoke\n---\n# Smoke\n\n![](diagram.png)\n',
+    );
+    try {
+      await run(process.execPath, [path.join(root, 'action.cjs')], options);
+      throw new Error('Unaccepted documentation debt must fail the standalone Action.');
+    } catch (error) {
+      if (error.code !== 1) throw error;
+    }
+    const debtReport = JSON.parse(
+      await readFile(path.join(root, 'reports/documentation-quality.json'), 'utf8'),
+    );
+    const debt = debtReport.diagnostics.find(
+      (diagnostic) => diagnostic.ruleId === 'DQ004',
+    );
+    if (!debt || debtReport.baselineReview.entries[0]?.state !== 'new')
+      throw new Error('Standalone Action omitted reviewable new debt.');
+    await writeFile(
+      path.join(root, '.docquality-baseline.json'),
+      JSON.stringify({
+        version: 1,
+        generatedAt: new Date().toISOString(),
+        entries: [
+          {
+            fingerprint: debt.fingerprint,
+            ruleId: debt.ruleId,
+            path: debt.file,
+            line: debt.location.line,
+          },
+        ],
+      }),
+    );
+    await run(process.execPath, [path.join(root, 'action.cjs')], options);
+    const acceptedReport = JSON.parse(
+      await readFile(path.join(root, 'reports/documentation-quality.json'), 'utf8'),
+    );
+    if (
+      acceptedReport.baselineReview.entries[0]?.state !== 'persistent' ||
+      acceptedReport.summary.suppressed !== 1
+    )
+      throw new Error('Standalone Action lost persistent accepted debt.');
+    if (
+      !(await readFile(path.join(root, 'summary.txt'), 'utf8')).includes(
+        'Baseline review',
+      )
+    )
+      throw new Error('Action summary omitted the review workflow.');
     await writeFile(
       path.join(root, 'guide.md'),
       '---\ntitle: [unterminated\n---\n# Smoke\n',
@@ -78,7 +127,7 @@ async function verifyStandaloneAction() {
     if (failedResult.summary.errors < 1)
       throw new Error('Standalone Action failed without reporting the bad document.');
     console.log(
-      'Standalone bundle: pass/fail fixtures, JSON, SARIF and HTML verified without node_modules.',
+      'Standalone bundle: pass/fail, new/persistent debt, Action summary, JSON, SARIF and HTML verified without node_modules.',
     );
   } finally {
     await rm(root, { recursive: true, force: true });

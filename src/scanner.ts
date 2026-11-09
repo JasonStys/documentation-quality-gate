@@ -10,6 +10,7 @@ import { loadConfiguration } from './config.js';
 import { createDiagnostic } from './diagnostics.js';
 import { discoverFiles } from './discovery.js';
 import { evaluateExternalLinks } from './external-links.js';
+import { loadBaselineSnapshot, reviewBaseline } from './baseline.js';
 import { applyGovernance } from './governance.js';
 import { SEVERITY_ORDER } from './model.js';
 import type { Diagnostic, DocumentFacts, ScanOptions, ScanResult } from './model.js';
@@ -120,6 +121,10 @@ export async function scanRepository(options: ScanOptions): Promise<ScanResult> 
       ? {}
       : { failOn: options.failureThreshold }),
   };
+  const baseline = await loadBaselineSnapshot(
+    rootDirectory,
+    effectiveConfiguration.baselineFile,
+  );
   const files = await discoverFiles(
     rootDirectory,
     effectiveConfiguration,
@@ -143,6 +148,7 @@ export async function scanRepository(options: ScanOptions): Promise<ScanResult> 
     [...parsed.diagnostics, ...ruleDiagnostics, ...networkDiagnostics],
     effectiveConfiguration,
     options.now,
+    baseline,
   );
   diagnostics.sort(
     (left, right) =>
@@ -170,5 +176,11 @@ export async function scanRepository(options: ScanOptions): Promise<ScanResult> 
     diagnostics,
     summary,
     failed,
+    baselineReview: reviewBaseline(
+      baseline,
+      diagnostics,
+      parsed.documents.map((document) => document.relativePath),
+      effectiveConfiguration,
+    ),
   };
 }

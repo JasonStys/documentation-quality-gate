@@ -10,6 +10,7 @@ import { loadConfiguration } from './config.js';
 import { createDiagnostic } from './diagnostics.js';
 import { discoverFiles } from './discovery.js';
 import { evaluateExternalLinks } from './external-links.js';
+import { loadBaselineSnapshot, reviewBaseline } from './baseline.js';
 import { applyGovernance } from './governance.js';
 import { SEVERITY_ORDER } from './model.js';
 import { parseHtmlDocument } from './parsers/html.js';
@@ -104,11 +105,12 @@ export async function scanRepository(options) {
             ? {}
             : { failOn: options.failureThreshold }),
     };
+    const baseline = await loadBaselineSnapshot(rootDirectory, effectiveConfiguration.baselineFile);
     const files = await discoverFiles(rootDirectory, effectiveConfiguration, options.paths, options.changedFrom);
     const parsed = await parseDocuments(rootDirectory, files);
     const ruleDiagnostics = await evaluateRules(rootDirectory, parsed.documents, effectiveConfiguration);
     const networkDiagnostics = await evaluateExternalLinks(rootDirectory, parsed.documents, effectiveConfiguration.externalLinks, options.now);
-    const diagnostics = await applyGovernance(rootDirectory, [...parsed.diagnostics, ...ruleDiagnostics, ...networkDiagnostics], effectiveConfiguration, options.now);
+    const diagnostics = await applyGovernance(rootDirectory, [...parsed.diagnostics, ...ruleDiagnostics, ...networkDiagnostics], effectiveConfiguration, options.now, baseline);
     diagnostics.sort((left, right) => left.file.localeCompare(right.file) ||
         left.location.line - right.location.line ||
         left.ruleId.localeCompare(right.ruleId));
@@ -131,6 +133,7 @@ export async function scanRepository(options) {
         diagnostics,
         summary,
         failed,
+        baselineReview: reviewBaseline(baseline, diagnostics, parsed.documents.map((document) => document.relativePath), effectiveConfiguration),
     };
 }
 //# sourceMappingURL=scanner.js.map

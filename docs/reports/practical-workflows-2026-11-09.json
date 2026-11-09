@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-09",
+  "repository": "documentation-quality-gate",
+  "scope": "Local Windows Node24 validation; hosted Windows/Linux Node22/24 remains coordinator gate",
+  "feature": "Reviewed baseline debt lifecycle",
+  "tests": {
+    "complete": 33,
+    "integration": 13,
+    "line_coverage": 94.94,
+    "branch_coverage": 81.83,
+    "baseline_lines": 96.03,
+    "baseline_branches": 91.91,
+    "governance_lines": 100
+  },
+  "consumer_workflows": {
+    "standalone_action_no_node_modules": "passed new debt, accepted persistent debt, summary and invalid-document enforcement",
+    "compiled_cli": "first explicit acceptance exits1 for pre-refresh policy, accepted repeat exits0, newly added defect exits1",
+    "actual_edge_mobile": {
+      "width": 390,
+      "keyboard_scrollable_tables": true,
+      "page_overflow": false,
+      "external_requests": 0,
+      "screenshot": "ignored artifacts/review-owner-demo-20261109/review-mobile.png"
+    }
+  },
+  "benchmark": [
+    {
+      "pages": 100,
+      "elapsedMs": 171.995,
+      "pagesPerSecond": 581.4,
+      "diagnostics": 0
+    },
+    {
+      "pages": 1000,
+      "elapsedMs": 670.44,
+      "pagesPerSecond": 1491.6,
+      "diagnostics": 0
+    },
+    {
+      "pages": 10000,
+      "elapsedMs": 5555.453,
+      "pagesPerSecond": 1800,
+      "diagnostics": 0
+    }
+  ],
+  "dependencies": {
+    "minimatch_direct": "11.0.1",
+    "scoped_override": "minimatch@>=7 <11.0.1 ->11.0.1",
+    "audit_known_vulnerabilities": 0
+  },
+  "bounds": {
+    "baseline_bytes": 2097152,
+    "baseline_entries": 10000,
+    "partial_scan_debt_retained": true,
+    "stale_scan_and_concurrent_write_refused": true,
+    "DQ000_DQ013_suppressible": false
+  },
+  "limitations": [
+    "Not-reproduced under current configuration is not proof of a fix",
+    "Fingerprints remain line-sensitive; no heuristic move matching",
+    "Deleted/excluded/unreadable documents remain unexamined until explicit human reconciliation",
+    "Adjacent lock coordinates cooperative CLI writers, not arbitrary external software; trusted checkout required",
+    "No manual screen-reader or hosted Actions run performed by this worker"
+  ]
+}
