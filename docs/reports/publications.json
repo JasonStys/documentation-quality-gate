@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "project": "documentation-quality-gate",
+  "author": "Jason Stys",
+  "editionDate": "2026-11-09",
+  "sourceBaseline": "0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+  "sourceUrl": "https://github.com/JasonStys/documentation-quality-gate/tree/0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+  "functionalEvidenceBaseline": "0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+  "evidenceObservedAt": "2026-11-10T05:25:40.628667+00:00",
+  "workflowEvidence": [
+    {
+      "conclusion": "success",
+      "databaseId": 42723193587,
+      "event": "push",
+      "headSha": "0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+      "name": "Documentation quality",
+      "status": "completed",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/42723193587"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 42723193966,
+      "event": "push",
+      "headSha": "0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+      "name": "CodeQL",
+      "status": "completed",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/42723193966"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 42723193924,
+      "event": "push",
+      "headSha": "0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+      "name": "CI",
+      "status": "completed",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/42723193924"
+    }
+  ],
+  "summary": "Review new, persistent, not-reproduced and unexamined debt with exact locations; refresh atomically without losing debt from partial scans or hiding operational errors.",
+  "rationale": "Makes accepted documentation debt maintainable rather than silently clearing it during repeat baseline refreshes.",
+  "limitations": [
+    "Not-reproduced means absent under the current configuration, not proven fixed. Fingerprints remain line-sensitive with no guessed move matching.",
+    "Deleted, excluded and unreadable files remain unexamined until human reconciliation.",
+    "The adjacent lease coordinates cooperative CLI writers, not arbitrary external software; use a trusted checkout."
+  ],
+  "documents": [
+    {
+      "filename": "project-guide.docx",
+      "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "bytes": 47478,
+      "sha256": "203c4105070e3b2be1c05b3463f4b90a386f93a20414f056de6f269095737ef3",
+      "sourceBaseline": "0757e5a18da5e0e8baf98a527d4fb6c54c752420",
+      "visualReview": {
+        "approved": true,
+        "method": "Every rendered page individually viewed at readable original resolution",
+        "pageCount": 8,
+        "renderedPageSha256": {
+          "page-1.png": "2092c7f968eb264dcff79389e2c07f68f289f34d1ffd0435a90850b6c8fe7640",
+          "page-2.png": "2197d0784f46fbd2b683810276715a37a96520c41efe8ec321873b0b9175ee32",
+          "page-3.png": "e5e7290be4e0b982bc07c361152fce2608dc726bf5b20f50f8f98a9b6937fa92",
+          "page-4.png": "ac980d055c8b718118b9cbf8e9581de02efd54e3052312ad9025e677c2cc8147",
+          "page-5.png": "f837677592a53c4088d33d8f2138d54aab68f4777fac159342021d5ebc39e48d",
+          "page-6.png": "61844e894bdbf1fd0b55a22da2da2acf14d3a58fe5a6969cb62a1171bea023bf",
+          "page-7.png": "1cec6f098db98924ea5b2a37bcf697efe78d14a9274e7f93e52b521f40767c47",
+          "page-8.png": "5d0d5532ff63ecfcef83a4987af43c32ccbaebfdd7149b71f59632917e7d2c04"
+        }
+      }
+    }
+  ],
+  "scope": "Reviewed documentation editions of the cited source. Checksums identify bytes, not authorship. Historical measurements retain their own dates; integration CI must be checked separately."
+}
