@@ -6,6 +6,10 @@ Review new, persistent, not-reproduced and unexamined debt with exact locations;
 
 Makes accepted documentation debt maintainable rather than silently clearing it during repeat baseline refreshes.
 
+Current installed application: [illustrated Word guide](reports/windows-application-guide-1.1.1.docx),
+[public review manifest](reports/windows-application-guide-1.1.1.json) and
+[measured installed/upgrade results](reports/installed-windows-1.1.1-2026-11-11.md).
+
 ## Read the documentation
 
 | Edition                                          | Audience and contents                                                                       |
@@ -20,7 +24,7 @@ The editable Markdown remains the maintenance source. The Word files are readabl
 
 ### Usage and operations
 
-- [Native documentation authoring and review](native-application.md): Windows 1.1.0 candidate workflow and executed local validation. The earlier Word edition retains its explicitly cited historical source.
+- [Native documentation authoring and review](native-application.md): published Windows 1.1.1 workflow, independent installed acceptance and actual synthetic 1.1.0-to-1.1.1 preservation. The earlier Word edition retains its explicitly cited historical source.
 
 - [operations](operations.md)
 

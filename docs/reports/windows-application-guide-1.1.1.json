@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "repository": "documentation-quality-gate",
+  "runtimeVersion": "1.1.1",
+  "runtimeSource": "c44a4bd5f0252fb258ff20c2f1f311541b3de6e5",
+  "createdAt": "2026-11-11T23:42:04.068Z",
+  "author": "Jason Stys",
+  "document": "windows-application-guide-1.1.1.docx",
+  "sha256": "a0322142008d525e131426fadcfd2d2abe0878386177080d68f15e234f8b2998",
+  "screenshots": [
+    {
+      "file": "installed111-exact-source.png",
+      "sha256": "b0fd289abcc135b6b66b05b8b09d4f8f2e0eaa9e8aac3d15210945f2dbc367a7",
+      "width": 1547,
+      "height": 651,
+      "caption": "Installed 1.1.1 opens docs/handoff.md at line 1, column 1 for its missing reviewed metadata. The earlier heading repair remains in the saved text; navigation is bound to the analyzed corpus fingerprint."
+    },
+    {
+      "file": "installed111-retained-findings.png",
+      "sha256": "633a2ecda2f3fc07167fe45b87c6110c367c3e05a445fdb33118791fbe4d5d85",
+      "width": 1491,
+      "height": 258,
+      "caption": "Both DQ001 findings remain at their exact file and line after the real 1.1.0-to-1.1.1 test. Accepted/excepted means retained debt; the metadata was not silently repaired or removed."
+    }
+  ],
+  "snippets": [
+    {
+      "file": "src/workbench/project.ts",
+      "first": 256,
+      "last": 276,
+      "sha256": "4ebcff346f0f2f6c7c6ccafc837c009f61377e4136b4b8fd33318ec7f2c462ba",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/blob/c44a4bd5f0252fb258ff20c2f1f311541b3de6e5/src/workbench/project.ts#L256"
+    }
+  ],
+  "observedTests": [
+    {
+      "name": "Installed original workflows",
+      "observed": "Five downloaded assets matched provider identities and checksums. The full original consumer and three Keep/three Discard replacement cases passed, with two normal exits, actual scanner, held export, no page errors and all 90 files unchanged.",
+      "result": "Passed"
+    },
+    {
+      "name": "Cross-version preservation",
+      "observed": "Actual installed 1.1.0 and 1.1.1 opened the same fresh synthetic profile. Exact document, attachment, policy, debt, current/previous-save and owner bytes survived; both 90-file program inventories stayed unchanged. Two normal exits and no outside requests.",
+      "result": "Passed"
+    },
+    {
+      "name": "Source and hosted",
+      "observed": "62 source plus 16 integration tests, 93.60% library lines; 26 native-helper and six archive controls passed at unchanged floors. All four main workflows and three processed CodeQL categories passed. Five actual Electron exit-status controls passed.",
+      "result": "Passed"
+    }
+  ],
+  "visualReview": {
+    "approved": true,
+    "reviewers": ["root", "audit_cyber"],
+    "ooxmlSchema": "passed",
+    "pageCount": 4,
+    "pages": [
+      {
+        "page": 1,
+        "sha256": "4ef27f853bc3aafe6a24419719e9105e7383b3c9feebedf174f509beaecf779e"
+      },
+      {
+        "page": 2,
+        "sha256": "f3a9f015188fb616b8748a10dd180ffa34410207eba893fa974146b5814ff623"
+      },
+      {
+        "page": 3,
+        "sha256": "8e560acb9118aaa07ec236f19d01683c34595e4e0e3027ecb35c66c6818e3af0"
+      },
+      {
+        "page": 4,
+        "sha256": "a1d14b96dc806a702574008f176a3ba5424112575a934618e1ddf7ee4f1ec6c0"
+      }
+    ],
+    "scope": "All unchanged final pages individually inspected; original screenshot and immutable code bytes checked."
+  },
+  "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "bytes": 74596,
+  "release": {
+    "id": 442307507,
+    "url": "https://github.com/JasonStys/documentation-quality-gate/releases/tag/v1.1.1",
+    "assets": [
+      {
+        "name": "DocumentationQuality-1.1.1-windows-x64.zip",
+        "bytes": 207280260,
+        "sha256": "e005541f24256dd30ad5acfbfdcbc96a947509bdaa5fd8a4e3ed6ed740aeee8e"
+      },
+      {
+        "name": "DocumentationQuality-1.1.1-windows-x64.zip.sha256",
+        "bytes": 109,
+        "sha256": "dec4c451431f5352b39db252d0f4cd49ed32f36a9f52bfe5d6f7c84c2094691a"
+      },
+      {
+        "name": "INSTALL.txt",
+        "bytes": 865,
+        "sha256": "29c4f5514ca525774bc36ef9a54ec658ad2f0aa733c98876fc6d97f1de2b2e15"
+      },
+      {
+        "name": "LICENSE.txt",
+        "bytes": 1067,
+        "sha256": "7bfeff0414583e7de937ae17f9c9a182f1c1a3f9350781b80e4d074d7fde4d48"
+      },
+      {
+        "name": "SOURCE.json",
+        "bytes": 1430,
+        "sha256": "2e6fedd3ba8db8c00cd21ba0e97993ee204b613b3f14bd47fa46d83c91296c74"
+      }
+    ]
+  },
+  "sourceChecks": [
+    {
+      "workflow": ".github/workflows/documentation-quality.yml",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/43120684664"
+    },
+    {
+      "workflow": ".github/workflows/codeql.yml",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/43120684526"
+    },
+    {
+      "workflow": ".github/workflows/ci.yml",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/43120684657"
+    },
+    {
+      "workflow": ".github/workflows/native-app.yml",
+      "url": "https://github.com/JasonStys/documentation-quality-gate/actions/runs/43120684602"
+    }
+  ],
+  "codeqlAnalysisIds": [2148012706, 2148011806, 2148011496],
+  "sourceEvidence": {
+    "authoringInputSha256": "34c478b730a2345269e083667011b9d058903a9e5574d8e198f110546655f713",
+    "installedReceiptSha256": "6d6dd20f3de8298ab8dca9fe1dd9d6d0b877acdf80624e6235fe4d0702ba8124",
+    "installedAcceptanceSha256": "f518f8010e2404e8c0f496610821cdafee189db366353e115511e24145c442b4",
+    "sameWorkspaceUpgradeSha256": "962e19ad7190e2bed32e03591d27a0e8ff3ed4c3fd45a6724b0a64e65fdb21ae",
+    "scope": "Dated exact-runtime aggregate observations; no private PC paths, raw receipts, profiles or account contents are published."
+  }
+}

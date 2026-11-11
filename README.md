@@ -9,9 +9,9 @@ A deterministic TypeScript CLI and JavaScript GitHub Action for technical-docume
 
 The design goal is adoption: stable rule IDs, precise locations, secure defaults, expiring suppressions, baseline protection, and reports that serve authors, reviewers, and program metrics without executing documentation code.
 
-The new **Windows documentation workbench** adds a complete editable corpus, document selection, customizable metadata/policy, exact saved-source inspection, reasoned baseline acceptance, previous-save recovery and original report exports. It uses the actual scanner and governance engine in an owned worker, with durable owner-local data outside the application. Prepared runbooks are editable data inside the full application. Read the [native application guide](docs/native-application.md) for operation, packaging, privacy and current candidate limitations.
+The new **Windows documentation workbench** adds a complete editable corpus, document selection, customizable metadata/policy, exact saved-source inspection, reasoned baseline acceptance, previous-save recovery and original report exports. It uses the actual scanner and governance engine in an owned worker, with durable owner-local data outside the application. Prepared runbooks are editable data inside the full application. Read the [native application guide](docs/native-application.md) for operation, packaging, privacy and the published portable release limits.
 
-The **1.1.1 candidate** adds an explicit Keep editing/Discard choice before replacing an unsaved corpus and reports fatal native startup with a real failure exit after owned work finishes. Normal successful Quit and the original CLI, Action and reporting contracts remain. Published 1.1.0 stays unchanged; see the [dated correction evidence](docs/reports/native-startup-and-replacement-2026-11-11.md).
+The [published **1.1.1** Windows release](https://github.com/JasonStys/documentation-quality-gate/releases/tag/v1.1.1) adds an explicit Keep editing/Discard choice before replacing an unsaved corpus and reports fatal native startup with a real failure exit after owned work finishes. Normal successful Quit and the original CLI, Action and reporting contracts remain. Published 1.1.0 stays unchanged; see the [dated correction evidence](docs/reports/native-startup-and-replacement-2026-11-11.md).
 
 ## 60-second quick start
 
@@ -256,3 +256,15 @@ MIT — see [LICENSE](LICENSE).
 Start with the [organized handbook](docs/handbook.md) for current usage, design, security and test guidance. Reviewed downloadable editions: [project-guide.docx](docs/reports/project-guide.docx).
 
 [Publication identities and source scope](docs/reports/publications.json) · [Documentation validation record](docs/reports/documentation-refresh-2026-11-09.md). Historical results retain their own tested revision and date.
+
+## Current Windows application guide
+
+The published **1.1.1** workbench has a reviewed four-page guide with actual installed screenshots,
+exact source navigation, saved-corpus/debt workflows and practical limits. Independent download
+and complete installed acceptance passed; a separate real 1.1.0-to-1.1.1 synthetic workspace
+retained its documents, attachment, policy, accepted debt, owner and current/previous saves.
+Historical Office editions and published 1.1.0 remain unchanged.
+
+- [windows-application-guide-1.1.1.docx](docs/reports/windows-application-guide-1.1.1.docx): illustrated use, actual source/findings screenshots, immutable code and measured scope.
+- [windows-application-guide-1.1.1.json](docs/reports/windows-application-guide-1.1.1.json): exact document, source, screenshot, reviewed-page and public release identities.
+- [installed-windows-1.1.1-2026-11-11.md](docs/reports/installed-windows-1.1.1-2026-11-11.md): independent installed workflows, cross-version preservation, startup correction and limits.
