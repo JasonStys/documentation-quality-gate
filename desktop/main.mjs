@@ -376,5 +376,12 @@ try {
     'Choose an empty or identified ordinary local profile outside application resources. Existing data and ownership evidence were preserved.',
   );
   exiting = true;
+  // Chromium has not started here. Release only this launch's exact retained token;
+  // a preexisting or subsequently changed owner lock must remain for review.
+  try {
+    profile?.close();
+  } catch {
+    // close() already refuses changed ownership and preserves that evidence.
+  }
   app.quit();
 }
