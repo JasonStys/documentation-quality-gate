@@ -29928,9 +29928,30 @@ function documentDiagnostic(document3, ruleId, severity, message, remediation, l
     location
   });
 }
-async function pathExists(candidate) {
+function repositoryLinkTarget(rootDirectory, sourceDirectory, rawFile) {
+  const decoded = decodePath(rawFile);
+  if (decoded.includes("\\") || decoded.includes("\0") || import_node_path.default.isAbsolute(decoded) || import_node_path.default.win32.isAbsolute(decoded) || /^[a-z][a-z\d+.-]*:/iu.test(decoded))
+    return null;
+  const relative = import_node_path.default.relative(
+    import_node_path.default.resolve(rootDirectory),
+    import_node_path.default.resolve(sourceDirectory, decoded)
+  );
+  if (relative === ".." || relative.startsWith(".." + import_node_path.default.sep) || import_node_path.default.isAbsolute(relative))
+    return null;
+  return relative.replaceAll("\\", "/");
+}
+async function localTargetExists(rootDirectory, relative) {
+  let candidate = import_node_path.default.resolve(rootDirectory);
+  const parts = relative.split("/").filter(Boolean);
   try {
-    await (0, import_promises.access)(candidate);
+    for (let index2 = 0; index2 < parts.length; index2++) {
+      candidate = import_node_path.default.join(candidate, parts[index2]);
+      const stat2 = await (0, import_promises.lstat)(candidate);
+      if (stat2.isSymbolicLink() || index2 < parts.length - 1 && !stat2.isDirectory())
+        return false;
+      if (index2 === parts.length - 1 && !stat2.isFile() && !stat2.isDirectory())
+        return false;
+    }
     return true;
   } catch {
     return false;
@@ -29957,19 +29978,19 @@ async function evaluateLocalLinks(rootDirectory, document3, documentsByPath) {
       continue;
     }
     const [rawFile = "", rawAnchor] = target.split("#", 2);
-    const normalizedFile = rawFile.length === 0 ? document3.relativePath : import_node_path.default.relative(
+    const normalizedFile = rawFile.length === 0 ? document3.relativePath : repositoryLinkTarget(
       rootDirectory,
-      import_node_path.default.resolve(import_node_path.default.dirname(document3.absolutePath), decodePath(rawFile))
-    ).replaceAll("\\", "/");
-    const targetDocument = documentsByPath.get(normalizedFile);
-    const absoluteTarget = import_node_path.default.resolve(rootDirectory, normalizedFile);
-    if (rawFile.length > 0 && targetDocument === void 0 && !await pathExists(absoluteTarget)) {
+      import_node_path.default.dirname(document3.absolutePath),
+      rawFile
+    );
+    const targetDocument = normalizedFile === null ? void 0 : documentsByPath.get(normalizedFile);
+    if (normalizedFile === null || rawFile.length > 0 && !await localTargetExists(rootDirectory, normalizedFile)) {
       diagnostics.push(
         documentDiagnostic(
           document3,
           "DQ005",
           "error",
-          `Local link target does not exist: ${rawFile}`,
+          `Local link target is missing or outside the ordinary repository tree: ${rawFile}`,
           "Create the target or update the relative path and preserve filename casing.",
           link2.location
         )
@@ -30005,7 +30026,7 @@ async function evaluateRules(rootDirectory, documents, configuration) {
     if (document3.format === "markdown") {
       for (const key of configuration.requiredMetadata) {
         const value2 = document3.metadata[key];
-        if (value2 === void 0 || value2 === null || typeof value2 === "string" && value2.trim().length === 0) {
+        if (!Object.hasOwn(document3.metadata, key) || value2 === void 0 || value2 === null || typeof value2 === "string" && value2.trim().length === 0) {
           diagnostics.push(
             documentDiagnostic(
               document3,
@@ -30276,7 +30297,7 @@ function createSarifReport(result) {
         tool: {
           driver: {
             name: "documentation-quality-gate",
-            version: "1.0.0",
+            version: "1.1.0",
             informationUri: "https://github.com/JasonStys/documentation-quality-gate",
             rules: RULES.map((rule) => ({
               id: rule.id,

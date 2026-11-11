@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2024", "DOM"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noFallthroughCasesInSwitch": true,
@@ -24,6 +24,7 @@
     "src/**/*.ts",
     "tests/**/*.ts",
     "vitest.config.mts",
-    "vitest.integration.config.mts"
+    "vitest.integration.config.mts",
+    "desktop/ui/**/*.ts"
   ]
 }

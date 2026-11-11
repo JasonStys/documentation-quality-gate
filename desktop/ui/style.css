@@ -1,0 +1,280 @@
+:root {
+  color-scheme: light;
+  font-family:
+    Segoe UI,
+    system-ui,
+    sans-serif;
+  color: #182c40;
+  background: #edf2f7;
+  font-size: 15px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #112b40;
+  color: #fff;
+  padding: 22px 28px;
+  border-bottom: 5px solid #16a6a1;
+}
+h1 {
+  margin: 4px 0;
+  font-size: 32px;
+}
+header p {
+  margin: 5px 0;
+  color: #d4e5ed;
+}
+.eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+nav {
+  display: flex;
+  gap: 10px;
+  padding: 16px 28px;
+  flex-wrap: wrap;
+  background: #fff;
+  border-bottom: 1px solid #c6d5df;
+}
+button {
+  font: inherit;
+  background: #fff;
+  color: #18374d;
+  border: 1px solid #8aa6b7;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+button:hover {
+  background: #e2f5f4;
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid #087b7a;
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+.primary {
+  background: #086c70;
+  color: #fff;
+  border-color: #086c70;
+}
+main {
+  display: grid;
+  grid-template-columns: 250px minmax(320px, 1.25fr) minmax(300px, 1fr);
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+.card {
+  background: #fff;
+  border: 1px solid #c8d5df;
+  border-radius: 9px;
+  padding: 18px;
+  box-shadow: 0 2px 6px #1b34450b;
+}
+h2 {
+  margin: 0 0 16px;
+  font-size: 21px;
+}
+h3 {
+  font-size: 16px;
+  margin: 20px 0 10px;
+}
+label {
+  display: block;
+  font-weight: 600;
+  margin: 12px 0;
+}
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  font: inherit;
+  color: #172f44;
+  background: #fff;
+  border: 1px solid #94aabb;
+  border-radius: 4px;
+  margin-top: 6px;
+  padding: 8px;
+}
+textarea {
+  font-family: Consolas, monospace;
+  line-height: 1.6;
+  resize: vertical;
+}
+.inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+.inline input {
+  width: auto;
+  margin: 0;
+}
+.muted {
+  font-size: 12px;
+  color: #526b7e;
+  line-height: 1.55;
+}
+.pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+.pair button {
+  font-size: 12px;
+}
+#source {
+  min-height: 490px;
+  white-space: pre;
+  tab-size: 2;
+}
+#status {
+  margin: 16px 20px;
+  padding: 12px 16px;
+  background: #deeeef;
+  border-left: 4px solid #087b7a;
+  min-height: 44px;
+}
+#status[data-error='true'] {
+  background: #fff0ec;
+  border-color: #ac3d27;
+}
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.section-title button {
+  font-size: 12px;
+}
+#documents {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+#documents button {
+  text-align: left;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+#documents button[aria-current='true'] {
+  background: #d9f1ef;
+  border-color: #087b7a;
+  font-weight: bold;
+}
+.summary {
+  white-space: pre-line;
+  padding: 12px;
+  background: #edf4f8;
+  line-height: 1.6;
+  border-radius: 5px;
+}
+#findings {
+  max-height: 310px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+.finding {
+  text-align: left;
+  display: block;
+  overflow-wrap: anywhere;
+}
+.finding strong,
+.finding span {
+  display: block;
+  margin-bottom: 4px;
+}
+.finding span {
+  font-size: 12px;
+}
+.finding.accepted {
+  border-style: dashed;
+  color: #536a7a;
+}
+.exports {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  border-top: 1px solid #c8d5df;
+  padding: 20px;
+}
+footer p {
+  font-size: 12px;
+  color: #526b7e;
+}
+#help-panel,
+#inspection {
+  margin: 0 20px 20px;
+  padding: 20px;
+  background: #fff;
+  line-height: 1.6;
+}
+#inspection-source {
+  height: 300px;
+}
+#baseline {
+  max-height: 200px;
+  overflow: auto;
+  font-size: 12px;
+}
+#attachments {
+  padding-left: 16px;
+  overflow-wrap: anywhere;
+}
+#attachments button {
+  font-size: 11px;
+  padding: 3px 6px;
+  margin-left: 5px;
+}
+details {
+  font-size: 12px;
+  line-height: 1.6;
+}
+summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+@media (max-width: 1150px) {
+  main {
+    grid-template-columns: 230px 1fr;
+  }
+  .review {
+    grid-column: 1/-1;
+  }
+  #source {
+    min-height: 400px;
+  }
+  footer {
+    display: block;
+  }
+  .exports {
+    margin-top: 12px;
+  }
+}

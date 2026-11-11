@@ -9,6 +9,8 @@ A deterministic TypeScript CLI and JavaScript GitHub Action for technical-docume
 
 The design goal is adoption: stable rule IDs, precise locations, secure defaults, expiring suppressions, baseline protection, and reports that serve authors, reviewers, and program metrics without executing documentation code.
 
+The new **Windows documentation workbench** adds a complete editable corpus, document selection, customizable metadata/policy, exact saved-source inspection, reasoned baseline acceptance, previous-save recovery and original report exports. It uses the actual scanner and governance engine in an owned worker, with durable owner-local data outside the application. Prepared runbooks are editable data inside the full application. Read the [native application guide](docs/native-application.md) for operation, packaging, privacy and current candidate limitations.
+
 ## 60-second quick start
 
 Requirements: Node.js 22 or newer and pnpm 11.

@@ -1,6 +1,6 @@
 {
   "name": "documentation-quality-gate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A deterministic TypeScript CLI and GitHub Action for actionable technical-documentation quality checks.",
   "keywords": [
     "documentation",
@@ -41,7 +41,11 @@
     "test": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.mts",
     "typecheck": "tsc --noEmit",
-    "verify": "pnpm format:check && pnpm code-map:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm dogfood && node scripts/verify-package.mjs"
+    "verify": "pnpm format:check && pnpm code-map:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm dogfood && node scripts/verify-package.mjs",
+    "native:stage": "node scripts/stage-native.mjs",
+    "native:test": "node --test --experimental-test-coverage --test-coverage-include=desktop/*.cjs --test-coverage-lines=95 --test-coverage-branches=85 --test-coverage-functions=95 desktop/tests/*.test.cjs",
+    "native:build": "node scripts/build-native.mjs",
+    "native:smoke": "node desktop/tests/native-smoke.mjs"
   },
   "dependencies": {
     "@actions/core": "3.0.1",

@@ -6,6 +6,8 @@ export interface RuleDefinition {
     readonly description: string;
 }
 export declare const RULES: readonly RuleDefinition[];
+/** Resolve only a relative URL path inside the selected repository, before any filesystem operation. */
+export declare function repositoryLinkTarget(rootDirectory: string, sourceDirectory: string, rawFile: string): string | null;
 /** Evaluates all deterministic built-in rules except optional network checks. */
 export declare function evaluateRules(rootDirectory: string, documents: readonly DocumentFacts[], configuration: QualityConfiguration): Promise<Diagnostic[]>;
 //# sourceMappingURL=rules.d.ts.map

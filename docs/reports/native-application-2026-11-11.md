@@ -1,0 +1,43 @@
+# Native documentation workbench validation — 2026-11-11
+
+## Change and rationale
+
+The Windows 1.1.0 application adds a real authoring/review workflow to the existing CLI and Action. It bundles the original scanner, Markdown/HTML parsers, baseline engine and report generators. The GUI edits selected documents, logical names, inert link assets, required fields, severity policy and reasoned exceptions. Exact source inspection is tied to the analyzed corpus hash. Saving invalidates earlier review actions; accepting a baseline recomputes the exact original engine decision. Current/previous corpus files survive restart, and accepted or unexamined debt remains visible.
+
+Two genuine original-rule gaps were reproduced before correction:
+
+- Missing `constructor`, `toString`, `valueOf` and `__proto__` metadata inherited JavaScript object properties and produced no required-field findings. The original regression failed; own-property checks now report missing authored fields while retaining valid explicitly authored values.
+- Literal and percent-encoded `../outside.txt` links were accepted when an owned inert sibling fixture existed outside the chosen root. The original regression expected `DQ005` at lines 5 and 6 but received no findings. Lexical confinement now precedes filesystem lookup, and static symlink/junction components below the root are refused. In-root parent links such as `../LICENSE` remain valid. No remote UNC host was contacted by these controls.
+
+## Observed local evidence
+
+| Scope                                                                                        | Executed result                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Complete Vitest source suite, including original tests and new corpus/engine regressions     | 62 passed; 93.60% lines (702/750), 93.35% statements (731/783), 83.20% branches (540/649), 97.87% functions (138/141)                                                                  |
+| Original source floors                                                                       | Unchanged: 88% lines/statements, 85% functions, 75% branches                                                                                                                           |
+| Six imported native helpers (`files`, `profile`, `state`, `operation`, `tasks`, `resources`) | 17 actual Node tests passed; 99.79% lines, 89.04% branches, 100% functions; 95/85/95 floors enforced                                                                                   |
+| Independent standard-library archive controls                                                | Six actual ZIP/filesystem tests passed, including traversal/devices, case collisions, declared links, real hardlinks, byte bounds and source growth                                    |
+| Strict TypeScript and repository ESLint                                                      | Passed as part of the full locked pnpm 11.19.0 verification chain                                                                                                                      |
+| Real bundled worker                                                                          | Original scanner returned one `DQ002` at `docs/handoff.md:7:1` in the two-document prepared corpus                                                                                     |
+| Initial unsigned Windows candidate after ZIP extraction and relocation                       | All 90 payload files independently rehashed; actual visible EXE launched twice, normal exits 0/0 and no renderer errors                                                                |
+| Expanded actual extracted-EXE consumer                                                       | Editable calibration HTML plus inert CSV references, invalid import/no-overwrite, canceled unsaved Quit, held actual export through repeated Quit/Close and durable restart all passed |
+
+The source coverage scope includes `worker.ts` as uncovered: actual child execution is not merged into the parent's V8 measurements. The six-helper native denominator excludes the Electron main/preload and browser UI; their behavior is exercised by the actual application consumer. These measurements do not imply universal worker/UI coverage or a rendered accessibility certification.
+
+The first package was built over baseline `f094066e972ec57318ce2ad6161c66c651f8af3c` with an explicit dirty-candidate flag. Its ZIP was 207,277,399 bytes, SHA-256 `f8d55feb0e5801d9498fd64b97ac46e57392a6bdf1982a7db15759c108fd1b02`. It established behavior, not clean final-source release provenance. Later clean-source packages and hosted checks are separate evidence; do not relabel this candidate as published or installed.
+
+## Actual user journeys and fault controls
+
+The native consumer opens the complete visible application, analyzes real Markdown, inspects exact source, changes a heading and observes a clear result, adds a required field and observes two real errors, then records a reasoned baseline and observes two retained accepted findings. It exports the original JSON, active-only SARIF and escaped HTML reports plus a portable corpus. JSON/HTML retain accepted debt; an empty SARIF result list after acceptance is the original active-only contract, not a clean-corpus assertion.
+
+An existing export remains byte-identical after overwrite refusal. Canceling a picker preserves files. A malformed corpus import preserves the current draft. Empty selection has an explicit status and retains unexamined debt. A second editable HTML/CSV workflow proves a missing local asset is found and actual asset import resolves it. Canceling unsaved Quit retains the editor. An intentionally held native save choice stays owned through repeated Quit and Close; releasing that exact accepted operation writes the report and permits normal process exit. Relaunch restores the same metadata policy and accepted debt.
+
+The initial SDK harness incorrectly launched a file instead of the package directory and saw the Electron version rather than product metadata; using the actual package entry corrected the test contract. The initial bundling attempt also reproduced the ESM-only `tinyglobby` entry incompatibility with a CommonJS worker. The native build now selects the same static CommonJS entry already used by the standalone Action. The original reporter contract and isolation controls were retained.
+
+## Workflow and remaining limits
+
+The new contents-read-only Windows job installs exact source/build graphs, verifies native/archive controls, builds clean source, creates/extracts the portable ZIP, compares all payload bytes and runs the unchanged actual consumer. Only bounded receipts and screenshots are retained normally. A complete unsigned ZIP is retained for one day only by an explicit trusted-main manual request. It does not publish a release or install anything.
+
+The original JavaScript CodeQL job/configuration identity and security-and-quality suite are retained. Actual Python packaging and Actions sources receive separate security-extended analyses. No new source exclusions, alert dismissals or query suppressions were added. Hosted jobs, processed analysis and open-alert state must be inspected at the exact PR/main head; local tests alone are not a hosted security clearance.
+
+The app is an unsigned Windows x64 portable application with plaintext single-OS-owner state and explicit static filesystem admission. It has no authenticated reviewer roles, live document repository connection, telemetry, signing or operational approval system. Same-owner concurrent namespace races and external OS sync/backup policy remain outside its boundary. No installed user data, global SDK, Docker configuration or existing release was changed by local candidate validation. See the [native guide](../native-application.md) for exact input and model bounds.

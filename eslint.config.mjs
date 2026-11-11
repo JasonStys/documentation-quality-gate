@@ -7,7 +7,16 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['artifacts/**', 'coverage/**', 'dist/**', 'node_modules/**'] },
+  {
+    ignores: [
+      'artifacts/**',
+      'coverage/**',
+      'dist/**',
+      '**/node_modules/**',
+      '.runtime/**',
+      'release/**',
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {
@@ -28,7 +37,31 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.{js,mjs}'],
+    files: ['desktop/**/*.{cjs,mjs}', 'scripts/*native*.mjs'],
+    languageOptions: {
+      globals: {
+        Buffer: 'readonly',
+        process: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        setImmediate: 'readonly',
+        URL: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        TextDecoder: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['desktop/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: { require: 'readonly', module: 'readonly' },
+    },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: ['**/*.{js,mjs,cjs}'],
     ...tseslint.configs.disableTypeChecked,
   },
 );

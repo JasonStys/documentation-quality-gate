@@ -3,7 +3,7 @@
  * @description Evaluates metadata, structure, links, accessibility, examples, warnings, and identifiers.
  * @remarks Key declarations are listed in source order; verified locations live in docs/code-map.md.
  */
-import { access } from 'node:fs/promises';
+import { lstat } from 'node:fs/promises';
 import path from 'node:path';
 import { createDiagnostic } from './diagnostics.js';
 export const RULES = [
@@ -129,10 +129,35 @@ function documentDiagnostic(document, ruleId, severity, message, remediation, lo
         location,
     });
 }
-/** Tests whether a filesystem path exists without leaking the platform-specific error. */
-async function pathExists(candidate) {
+/** Resolve only a relative URL path inside the selected repository, before any filesystem operation. */
+export function repositoryLinkTarget(rootDirectory, sourceDirectory, rawFile) {
+    const decoded = decodePath(rawFile);
+    if (decoded.includes('\\') ||
+        decoded.includes('\0') ||
+        path.isAbsolute(decoded) ||
+        path.win32.isAbsolute(decoded) ||
+        /^[a-z][a-z\d+.-]*:/iu.test(decoded))
+        return null;
+    const relative = path.relative(path.resolve(rootDirectory), path.resolve(sourceDirectory, decoded));
+    if (relative === '..' ||
+        relative.startsWith('..' + path.sep) ||
+        path.isAbsolute(relative))
+        return null;
+    return relative.replaceAll('\\', '/');
+}
+/** Refuse static symlink/junction components below the admitted root; never probe through an outside alias. */
+async function localTargetExists(rootDirectory, relative) {
+    let candidate = path.resolve(rootDirectory);
+    const parts = relative.split('/').filter(Boolean);
     try {
-        await access(candidate);
+        for (let index = 0; index < parts.length; index++) {
+            candidate = path.join(candidate, parts[index]);
+            const stat = await lstat(candidate);
+            if (stat.isSymbolicLink() || (index < parts.length - 1 && !stat.isDirectory()))
+                return false;
+            if (index === parts.length - 1 && !stat.isFile() && !stat.isDirectory())
+                return false;
+        }
         return true;
     }
     catch {
@@ -154,15 +179,11 @@ async function evaluateLocalLinks(rootDirectory, document, documentsByPath) {
         const [rawFile = '', rawAnchor] = target.split('#', 2);
         const normalizedFile = rawFile.length === 0
             ? document.relativePath
-            : path
-                .relative(rootDirectory, path.resolve(path.dirname(document.absolutePath), decodePath(rawFile)))
-                .replaceAll('\\', '/');
-        const targetDocument = documentsByPath.get(normalizedFile);
-        const absoluteTarget = path.resolve(rootDirectory, normalizedFile);
-        if (rawFile.length > 0 &&
-            targetDocument === undefined &&
-            !(await pathExists(absoluteTarget))) {
-            diagnostics.push(documentDiagnostic(document, 'DQ005', 'error', `Local link target does not exist: ${rawFile}`, 'Create the target or update the relative path and preserve filename casing.', link.location));
+            : repositoryLinkTarget(rootDirectory, path.dirname(document.absolutePath), rawFile);
+        const targetDocument = normalizedFile === null ? undefined : documentsByPath.get(normalizedFile);
+        if (normalizedFile === null ||
+            (rawFile.length > 0 && !(await localTargetExists(rootDirectory, normalizedFile)))) {
+            diagnostics.push(documentDiagnostic(document, 'DQ005', 'error', `Local link target is missing or outside the ordinary repository tree: ${rawFile}`, 'Create the target or update the relative path and preserve filename casing.', link.location));
             continue;
         }
         // Only a parsed target (or this document) has known markup anchors.
@@ -187,7 +208,8 @@ export async function evaluateRules(rootDirectory, documents, configuration) {
         if (document.format === 'markdown') {
             for (const key of configuration.requiredMetadata) {
                 const value = document.metadata[key];
-                if (value === undefined ||
+                if (!Object.hasOwn(document.metadata, key) ||
+                    value === undefined ||
                     value === null ||
                     (typeof value === 'string' && value.trim().length === 0)) {
                     diagnostics.push(documentDiagnostic(document, 'DQ001', 'error', `Required metadata field is missing or empty: ${key}`, `Add ${key} to the YAML front matter with a non-empty value.`, document.metadataLocation));

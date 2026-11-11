@@ -20,6 +20,8 @@ The editable Markdown remains the maintenance source. The Word files are readabl
 
 ### Usage and operations
 
+- [Native documentation authoring and review](native-application.md): Windows 1.1.0 candidate workflow and executed local validation. The earlier Word edition retains its explicitly cited historical source.
+
 - [operations](operations.md)
 
 ### Design and contracts

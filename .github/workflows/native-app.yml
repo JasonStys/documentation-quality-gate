@@ -1,0 +1,71 @@
+# File: Build and actually use the complete unsigned Windows app in a fresh relocated synthetic profile.
+name: Native application
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      upload_package:
+        description: Retain the tested unsigned ZIP for one day on trusted main only
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    name: Actual relocated Windows documentation workbench
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14.10'
+      - name: Install exact build graphs
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+          npm --prefix desktop ci --ignore-scripts
+      - name: Install exact locked Electron runtime
+        run: node desktop/node_modules/electron/install.js
+      - name: Verify bounded helper and real archive controls
+        run: |
+          pnpm native:test
+          python -m unittest discover -s tests -p test_native_archive.py -v
+      - name: Build exact clean native application
+        run: node scripts/build-native.mjs release/hosted
+      - name: Relocate every actual payload and use the real app twice
+        run: python scripts/archive_native.py release/hosted/win-unpacked .runtime/native-hosted
+      - name: Audit exact native tool graph
+        run: npm --prefix desktop audit --audit-level=moderate
+      - name: Retain bounded receipts and actual screenshots
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: documentation-native-proof
+          path: |
+            .runtime/native-hosted/proof.json
+            .runtime/native-hosted/archive.json
+            .runtime/native-hosted/failure.json
+            .runtime/native-hosted/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Retain complete unsigned ZIP only by explicit trusted-main request
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.upload_package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: documentation-native-package
+          path: |
+            release/hosted/DocumentationQuality-1.1.0-windows-x64.zip
+            release/hosted/DocumentationQuality-1.1.0-windows-x64.zip.sha256
+          if-no-files-found: error
+          retention-days: 1
