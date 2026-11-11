@@ -34,7 +34,7 @@ function verifiedResources(root, ownerRoot) {
       'files|owner|product|schema|source|sourceDirty|version' ||
     metadata.schema !== 1 ||
     metadata.product !== 'documentation-quality-gate' ||
-    metadata.version !== '1.1.0' ||
+    metadata.version !== '1.1.1' ||
     !/^[a-f0-9]{40}$/.test(metadata.source) ||
     typeof metadata.sourceDirty !== 'boolean' ||
     !metadata.files ||

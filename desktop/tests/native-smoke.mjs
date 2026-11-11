@@ -57,7 +57,7 @@ async function launch() {
     node: process.versions.node,
     packaged: app.isPackaged,
   }));
-  expect(identity.version).toBe('1.1.0');
+  expect(identity.version).toBe('1.1.1');
   expect(identity.electron).toBe('44.11.1');
   expect(identity.packaged).toBe(Boolean(executable));
   identities.push(identity);
@@ -161,7 +161,7 @@ try {
     }
     if (format === 'sarif') {
       const report = JSON.parse(text);
-      expect(report.runs[0].tool.driver.version).toBe('1.1.0');
+      expect(report.runs[0].tool.driver.version).toBe('1.1.1');
       expect(report.runs[0].results).toHaveLength(0); // Original SARIF exports active findings; JSON/HTML retain accepted debt.
     }
     if (format === 'html') expect(text.toLowerCase()).toContain('<!doctype html>');
@@ -295,7 +295,119 @@ try {
     path: path.join(output, 'native-restored-corpus.png'),
     fullPage: true,
   });
+  // Whole-corpus replacements require a choice before discarding unapplied text, policy and selection.
+  const savedBeforeReplacement = await fs.readFile(path.join(profile, 'project.json'));
+  const previousProject = JSON.parse(
+    await fs.readFile(path.join(profile, 'previous.json'), 'utf8'),
+  ).project;
+  const exportedProject = JSON.parse(
+    await fs.readFile(path.join(output, 'corpus.json'), 'utf8'),
+  );
+  const replacementCases = [];
+  for (const target of ['prepared', 'restore', 'import-project']) {
+    const marker = 'Keep this unsaved source before ' + target;
+    await page.locator('#source').fill(marker);
+    await page.locator('#title').fill('Unsaved corpus title for ' + target);
+    await page.locator('#metadata').fill('title, owner');
+    await page.locator('#selected').uncheck();
+    const before = await page.evaluate(() => ({
+      source: globalThis.document.querySelector('#source').value,
+      title: globalThis.document.querySelector('#title').value,
+      metadata: globalThis.document.querySelector('#metadata').value,
+      filename: globalThis.document.querySelector('#filename').value,
+      selected: globalThis.document.querySelector('#selected').checked,
+      exceptions: globalThis.document.querySelector('#exceptions').value,
+    }));
+    await app.evaluate(
+      ({ dialog }, filename) => {
+        globalThis.replacementChoices = [];
+        globalThis.replacementPickers = 0;
+        dialog.showMessageBox = async (_window, options) => {
+          globalThis.replacementChoices.push({
+            buttons: options.buttons,
+            defaultId: options.defaultId,
+            cancelId: options.cancelId,
+          });
+          return { response: 0, checkboxChecked: false };
+        };
+        dialog.showOpenDialog = async () => {
+          globalThis.replacementPickers++;
+          return { canceled: false, filePaths: [filename] };
+        };
+      },
+      path.join(output, 'corpus.json'),
+    );
+    await page.locator('#' + target).click();
+    await expect(page.locator('#status')).toContainText('Kept unsaved corpus edits');
+    expect(
+      await page.evaluate(() => ({
+        source: globalThis.document.querySelector('#source').value,
+        title: globalThis.document.querySelector('#title').value,
+        metadata: globalThis.document.querySelector('#metadata').value,
+        filename: globalThis.document.querySelector('#filename').value,
+        selected: globalThis.document.querySelector('#selected').checked,
+        exceptions: globalThis.document.querySelector('#exceptions').value,
+      })),
+    ).toEqual(before);
+    expect(await app.evaluate(() => globalThis.replacementChoices)).toEqual([
+      { buttons: ['Keep editing', 'Discard and replace'], defaultId: 0, cancelId: 0 },
+    ]);
+    expect(await app.evaluate(() => globalThis.replacementPickers)).toBe(0);
+    expect(
+      (await fs.readFile(path.join(profile, 'project.json'))).equals(
+        savedBeforeReplacement,
+      ),
+    ).toBe(true);
+    await app.evaluate(({ dialog }) => {
+      dialog.showMessageBox = async () => ({ response: 1, checkboxChecked: false });
+    });
+    await page.locator('#' + target).click();
+    await expect(page.locator('#status')).toContainText(
+      target === 'prepared'
+        ? 'Prepared runbook loaded'
+        : target === 'restore'
+          ? 'Previous save loaded'
+          : 'Imported data is staged',
+    );
+    const expected =
+      target === 'restore'
+        ? previousProject
+        : target === 'import-project'
+          ? exportedProject
+          : null;
+    await expect(page.locator('#title')).toHaveValue(
+      expected?.title ?? 'Service recovery documentation review',
+    );
+    await expect(page.locator('#filename')).toHaveValue(
+      expected?.documents[0].path ?? 'README.md',
+    );
+    if (expected) {
+      await expect(page.locator('#source')).toHaveValue(expected.documents[0].text);
+      await expect(page.locator('#metadata')).toHaveValue(
+        expected.policy.requiredMetadata.join(', '),
+      );
+    } else {
+      await expect(page.locator('#source')).toHaveValue(/# Recovery runbook/u);
+      await expect(page.locator('#metadata')).toHaveValue('title, owner');
+    }
+    expect(
+      (await fs.readFile(path.join(profile, 'project.json'))).equals(
+        savedBeforeReplacement,
+      ),
+    ).toBe(true);
+    replacementCases.push({
+      target,
+      keepPreservedAllFields: true,
+      discardLoadedExpectedCorpus: true,
+      replacementDoesNotSave: true,
+    });
+  }
   await finish(app);
+  expect(
+    (await fs.readFile(path.join(profile, 'project.json'))).equals(
+      savedBeforeReplacement,
+    ),
+  ).toBe(true);
   expect(errors).toEqual([]);
   expect(exits).toEqual([0, 0]);
   await fs.writeFile(
@@ -303,7 +415,7 @@ try {
     JSON.stringify(
       {
         passed: true,
-        version: '1.1.0',
+        version: '1.1.1',
         visibleLaunches: 2,
         actualWorker: true,
         exactSourceLine: 7,
@@ -313,6 +425,7 @@ try {
         customHtmlAndAttachment: true,
         unsavedQuitCanceled: true,
         heldQuit: true,
+        wholeCorpusReplacementChoices: replacementCases,
         exits,
         pageErrors: errors,
         identities,

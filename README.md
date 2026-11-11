@@ -11,6 +11,8 @@ The design goal is adoption: stable rule IDs, precise locations, secure defaults
 
 The new **Windows documentation workbench** adds a complete editable corpus, document selection, customizable metadata/policy, exact saved-source inspection, reasoned baseline acceptance, previous-save recovery and original report exports. It uses the actual scanner and governance engine in an owned worker, with durable owner-local data outside the application. Prepared runbooks are editable data inside the full application. Read the [native application guide](docs/native-application.md) for operation, packaging, privacy and current candidate limitations.
 
+The **1.1.1 candidate** adds an explicit Keep editing/Discard choice before replacing an unsaved corpus and reports fatal native startup with a real failure exit after owned work finishes. Normal successful Quit and the original CLI, Action and reporting contracts remain. Published 1.1.0 stays unchanged; see the [dated correction evidence](docs/reports/native-startup-and-replacement-2026-11-11.md).
+
 ## 60-second quick start
 
 Requirements: Node.js 22 or newer and pnpm 11.

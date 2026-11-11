@@ -166,7 +166,7 @@ const digest = (file) =>
 const metadata = {
   schema: 1,
   product: 'documentation-quality-gate',
-  version: '1.1.0',
+  version: '1.1.1',
   source,
   sourceDirty,
   files: Object.fromEntries(

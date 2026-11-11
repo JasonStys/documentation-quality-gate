@@ -19,7 +19,7 @@ const staging = path.join(
   '.runtime',
   'native-stage-' + randomBytes(8).toString('hex'),
 );
-const version = '1.1.0';
+const version = '1.1.1';
 
 /** @param {string} executable Fixed build executable. @param {string[]} args Literal arguments. @returns {string} Bounded output. */
 function checked(executable, args) {

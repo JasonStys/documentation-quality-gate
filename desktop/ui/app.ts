@@ -270,6 +270,14 @@ function replaceProject(value: NativeProject): void {
   renderEditor();
   changed();
 }
+async function allowReplacement(
+  target: 'prepared' | 'previous' | 'import-project',
+): Promise<boolean> {
+  if (!dirty) return true;
+  const confirmed = await call<boolean>('discard-replacement', target);
+  if (!confirmed) message('Kept unsaved corpus edits. No replacement was loaded.');
+  return confirmed;
+}
 for (const id of [
   'title',
   'metadata',
@@ -300,12 +308,14 @@ button('analyze').addEventListener('click', () => {
 });
 button('prepared').addEventListener('click', () => {
   void work(async () => {
+    if (!(await allowReplacement('prepared'))) return;
     replaceProject(await call<NativeProject>('prepared'));
     message('Prepared runbook loaded into the full editor. Save to apply it.');
   });
 });
 button('restore').addEventListener('click', () => {
   void work(async () => {
+    if (!(await allowReplacement('previous'))) return;
     replaceProject(await call<NativeProject>('previous'));
     message('Previous save loaded for inspection. Save explicitly to restore it.');
   });
@@ -339,6 +349,7 @@ button('remove').addEventListener('click', () => {
 for (const kind of ['project', 'document', 'attachment'] as const)
   button('import-' + kind).addEventListener('click', () => {
     void work(async () => {
+      if (kind === 'project' && !(await allowReplacement('import-project'))) return;
       const value = await call<
         | null
         | { project: NativeProject }

@@ -37,10 +37,12 @@ jobs:
           npm --prefix desktop ci --ignore-scripts
       - name: Install exact locked Electron runtime
         run: node desktop/node_modules/electron/install.js
-      - name: Verify bounded helper and real archive controls
-        run: |
-          pnpm native:test
-          python -m unittest discover -s tests -p test_native_archive.py -v
+      - name: Verify bounded helpers and retained startup ownership
+        run: pnpm native:test
+      - name: Verify real archive controls independently
+        run: python -m unittest discover -s tests -p test_native_archive.py -v
+      - name: Observe actual Electron failure and normal exit statuses
+        run: node desktop/tests/startup-electron.mjs .runtime/startup-electron-hosted
       - name: Build exact clean native application
         run: node scripts/build-native.mjs release/hosted
       - name: Relocate every actual payload and use the real app twice
@@ -57,6 +59,7 @@ jobs:
             .runtime/native-hosted/archive.json
             .runtime/native-hosted/failure.json
             .runtime/native-hosted/*.png
+            .runtime/startup-electron-hosted/proof.json
           if-no-files-found: ignore
           retention-days: 7
       - name: Retain complete unsigned ZIP only by explicit trusted-main request
@@ -65,7 +68,7 @@ jobs:
         with:
           name: documentation-native-package
           path: |
-            release/hosted/DocumentationQuality-1.1.0-windows-x64.zip
-            release/hosted/DocumentationQuality-1.1.0-windows-x64.zip.sha256
+            release/hosted/DocumentationQuality-1.1.1-windows-x64.zip
+            release/hosted/DocumentationQuality-1.1.1-windows-x64.zip.sha256
           if-no-files-found: error
           retention-days: 1

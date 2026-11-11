@@ -28,7 +28,7 @@ function fixture(t) {
   const metadata = {
     schema: 1,
     product: 'documentation-quality-gate',
-    version: '1.1.0',
+    version: '1.1.1',
     source: 'a'.repeat(40),
     sourceDirty: false,
     files: write(payload, PAYLOAD),
@@ -42,7 +42,7 @@ function fixture(t) {
 test('only the exact three renderer resources are served, never the Node engine or private paths', async (t) => {
   const value = fixture(t),
     verified = verifiedResources(value.payload, value.owner);
-  assert.equal(verified.metadata.version, '1.1.0');
+  assert.equal(verified.metadata.version, '1.1.1');
   const own = responseFor(new Request('docquality://workbench/'), verified.data);
   assert.equal(own.status, 200);
   assert.match(await own.text(), /inert/);

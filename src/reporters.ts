@@ -67,7 +67,7 @@ export function createSarifReport(result: ScanResult): object {
         tool: {
           driver: {
             name: 'documentation-quality-gate',
-            version: '1.1.0',
+            version: '1.1.1',
             informationUri: 'https://github.com/JasonStys/documentation-quality-gate',
             rules: RULES.map((rule) => ({
               id: rule.id,
