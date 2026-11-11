@@ -37,6 +37,8 @@ The passing second candidate was built over baseline `ff11a022d0b61770353b6c98ac
 
 The first candidate correctly failed the unchanged full consumer because the original SARIF driver still reported version 1.1.0 while the application, binary and source metadata were 1.1.1. The versioned reporter contract was corrected, with a package-manifest comparison added to the existing reporter test. A fresh archive then passed; the failed archive remains separate. An earlier local archive check used the older document-rendering Python and lacked the required ZIP API; the unchanged tests passed with the project's required isolated Python 3.14.10 rather than changing the archive implementation.
 
+The first hosted native job then failed before its Electron observations because a clean checkout had no `.runtime` parent directory. The controller now creates only its admitted owned parent and still requires a fresh exclusive final output. A genuinely absent nested parent is exercised locally; the failed hosted log remains separate. This corrects a test prerequisite, not an application assertion or a runner acquisition problem.
+
 Run `pnpm verify`, `pnpm native:test`, the archive tests, `node desktop/tests/startup-electron.mjs .runtime/fresh-status-proof`, and the exact-source build/archive consumer described in the native guide. PR/main CodeQL results, independent release downloads, installation and shortcut updates are separate observations; no later result is inferred here.
 
 ## Limits

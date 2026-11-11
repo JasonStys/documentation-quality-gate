@@ -23,6 +23,8 @@ if (
 )
   throw new Error('Choose a fresh own-project synthetic .runtime output.');
 ancestors(path.dirname(output));
+fs.mkdirSync(path.dirname(output), { recursive: true });
+ancestors(path.dirname(output));
 fs.mkdirSync(output);
 newFile(path.join(output, 'synthetic.marker'), 'docquality-real-electron-status-v1\n');
 const executable = path.join(root, 'desktop/node_modules/electron/dist/electron.exe');
