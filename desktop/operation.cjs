@@ -30,4 +30,14 @@ function createOperations() {
     },
   };
 }
-module.exports = { createOperations };
+/** Failed startup alone may explicitly exit nonzero, after the same actual retained-work drain. */
+async function finishFailedStartup(owner, profile, exit) {
+  await owner.finish();
+  try {
+    profile?.close();
+  } catch {
+    // An already-foreign or changed lock stays intact. Startup still reports failure.
+  }
+  exit(1);
+}
+module.exports = { createOperations, finishFailedStartup };

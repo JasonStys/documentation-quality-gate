@@ -4,7 +4,7 @@
 
 The native application is the same documentation quality engine used by the CLI and GitHub Action, with a full local authoring and review interface. Authors edit Markdown or HTML, select an exact corpus, add inert reference assets, customize required metadata and severity policy, review exact findings, and export original reports. Reviewers can explicitly accept a recomputed baseline with a reason. Accepted, persistent and unexamined debt remains visible; acceptance is not evidence that a document was fixed.
 
-Version 1.1.0 is an unsigned Windows x64 portable application candidate. Publication, installation and independent downloaded acceptance are separate later steps. It bundles Electron and the actual scanner dependencies; users do not need Node, pnpm, an IDE or Python to run the delivered EXE. The existing cross-platform CLI and Action remain available.
+Version 1.1.1 is an unsigned Windows x64 portable application candidate. It corrects fatal-startup exit status and protects unsaved edits during whole-corpus replacement. The published 1.1.0 remains an immutable earlier release. Publication, installation and independent downloaded acceptance of 1.1.1 are separate later steps. The application bundles Electron and the actual scanner dependencies; users do not need Node, pnpm, an IDE or Python to run the delivered EXE. The existing cross-platform CLI and Action remain available.
 
 ## Use the application
 
@@ -19,6 +19,8 @@ Version 1.1.0 is an unsigned Windows x64 portable application candidate. Publica
 9. **Restore previous save** loads the immediately previous corpus into the editor. Inspect it and save explicitly to restore it. It is one recovery checkpoint, not an unlimited backup history.
 10. Use **Exit application** or the window Close control. Unsaved edits offer Keep editing or Discard. Accepted workers and file-dialog/export operations are retained through repeated Quit/Close until their actual completion; there is no forced successful shutdown deadline.
 
+Loading prepared data, restoring the previous corpus or importing a whole corpus asks **Keep editing** or **Discard and replace** when the current editor has unsaved changes. Keep editing preserves document text, filename, selection and policy and does not open an import picker. Discard permits the chosen replacement into the draft only; it does not save it. Invalid or canceled import still preserves the current draft. Adding an individual document or inert attachment does not replace the complete corpus.
+
 ## Data and trust boundary
 
 The default durable directory is `%LOCALAPPDATA%\JasonStysPortfolio\documentation-quality-gate\workspace`, outside the installation and Git repository. It contains identified owner metadata, a retained per-launch lock, current/previous corpus JSON and separate Chromium state. A custom absolute `--profile` is for an explicitly chosen empty or already identified ordinary directory. Unknown files, stale locks, corrupt state, pre-existing junction/symlink ancestors and hardlinked mutable members are refused without reset. Preserve unexplained ownership evidence for review.
@@ -27,13 +29,15 @@ Corpus text, inert attachments, baseline decisions, exports and Chromium state a
 
 If synchronous startup is refused after this launch acquires a workspace, it releases only its own exact ownership token before exiting with failure status. A preexisting or subsequently changed lock remains intact for review. Startup refusal does not reset the saved corpus or ownership marker. Fault-controlled tests exercise the real main module and real profile files while substituting only the Electron refusal API; these tests do not claim that a live operating-system instance collision occurred.
 
+Actual pinned Electron 44.11.1 observation showed that `process.exitCode = 1` followed by `app.quit()` returns zero. Failed startup therefore seals and awaits the real retained-operation owner, preserves changed ownership, then uses `app.exit(1)`. It does not exit while accepted worker or file work remains. A refused drain retains ownership rather than forcing an exit. The normal successful Quit path still drains and uses `app.quit()` unchanged. Separate real Electron tests import the real main/profile code with only error-dialog display redirected; they cover foreign-lock refusal and missing-resource startup failure, with zero-success and explicit-exit controls.
+
 Only fixed immutable UI resources are served on `docquality://workbench/`. The renderer is sandboxed, Node integration is disabled, context isolation is enabled, external navigation/popups/downloads/permissions are denied, and the closed bridge has no arbitrary host-path or process interface. Actual bundled source and owner hashes are verified before module loading. Hashes identify bytes; the package is unsigned and those hashes are not publisher authentication.
 
 Native limits are 64 documents, 1 MiB per document, 8 MiB total document text; 16 inert attachments, 1 MiB each and 2 MiB combined; a 16 MiB serialized corpus, 32 JSON nesting levels and 100,000 structural tokens; 5,000 findings, 15,000 baseline-review entries and 16 MiB per generated report. Excess input fails explicitly rather than truncating findings. The CLI retains its separate repository discovery, 5 MiB document limit and optional network controls.
 
 ## Reproduce native validation
 
-Developers use the locked pnpm 11.19.0 graph and a separate locked `desktop` build graph:
+Developers use the locked pnpm 11.19.0 graph, a separate locked `desktop` build graph and Python 3.14.10 for the archive tests and ZIP consumer. Python is a developer verification tool, not an end-user runtime requirement:
 
 ```powershell
 corepack enable
@@ -42,6 +46,7 @@ npm --prefix desktop ci --ignore-scripts
 node desktop/node_modules/electron/install.js
 pnpm verify
 pnpm native:test
+node desktop/tests/startup-electron.mjs .runtime/startup-status-verification
 python -m unittest discover -s tests -p test_native_archive.py -v
 node scripts/build-native.mjs release/verification
 python scripts/archive_native.py release/verification/win-unpacked .runtime/native-verification

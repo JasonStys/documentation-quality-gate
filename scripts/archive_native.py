@@ -195,7 +195,7 @@ def main():
         and proof.is_relative_to(ROOT / ".runtime"),
         "Generated native paths must remain in their project output directories",
     )
-    archive = bundle.parent / "DocumentationQuality-1.1.0-windows-x64.zip"
+    archive = bundle.parent / "DocumentationQuality-1.1.1-windows-x64.zip"
     digest = create_archive(bundle, archive)
     extracted = bundle.parent / "zip-relocated"
     extract_archive(archive, extracted)
@@ -215,7 +215,7 @@ def main():
         (extracted / "resources/workbench/SOURCE.json").read_text(encoding="utf-8")
     )
     require(
-        metadata["version"] == "1.1.0"
+        metadata["version"] == "1.1.1"
         and metadata["product"] == "documentation-quality-gate",
         "Relocated product identity differs",
     )

@@ -49,6 +49,25 @@ describe('reporters', () => {
       expect(JSON.stringify(createSarifReport(result))).toContain(
         'primaryLocationLineHash',
       );
+      const manifest: unknown = JSON.parse(
+        await readFile(new URL('../../package.json', import.meta.url), 'utf8'),
+      );
+      if (
+        !manifest ||
+        typeof manifest !== 'object' ||
+        !('version' in manifest) ||
+        typeof manifest.version !== 'string'
+      )
+        throw new Error('The authored package version is required.');
+      expect(createSarifReport(result)).toMatchObject({
+        runs: [
+          {
+            tool: {
+              driver: { name: 'documentation-quality-gate', version: manifest.version },
+            },
+          },
+        ],
+      });
       const html = createHtmlReport(result);
       expect(html).toContain('&lt;script&gt;');
       expect(html).not.toContain('<script>alert');

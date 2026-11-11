@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const { openProfile } = require('./profile.cjs');
 const { openState } = require('./state.cjs');
-const { createOperations } = require('./operation.cjs');
+const { createOperations, finishFailedStartup } = require('./operation.cjs');
 const { runTask } = require('./tasks.cjs');
 const { newFile, readUtf8, readRegular } = require('./files.cjs');
 const { verifiedResources, responseFor } = require('./resources.cjs');
@@ -87,10 +87,25 @@ function envelope(value) {
   return { schema: 1, project, decision };
 }
 function result() {
-  return { ...store.load(), analysis: lastAnalysis ?? null, version: '1.1.0' };
+  return { ...store.load(), analysis: lastAnalysis ?? null, version: '1.1.1' };
 }
 
 async function request(operation, value) {
+  if (
+    operation === 'discard-replacement' &&
+    ['prepared', 'previous', 'import-project'].includes(value)
+  ) {
+    const choice = await dialog.showMessageBox(window, {
+      type: 'warning',
+      message: 'Discard unsaved corpus edits?',
+      detail:
+        'Keep editing to retain your current document, selection and policy. Discard permits only the selected replacement; the saved corpus remains unchanged until an explicit Save.',
+      buttons: ['Keep editing', 'Discard and replace'],
+      defaultId: 0,
+      cancelId: 0,
+    });
+    return choice.response === 1;
+  }
   if (operation === 'load' && value === null) return result();
   if (operation === 'prepared' && value === null) return api.preparedProject();
   if (operation === 'previous' && value === null) return store.previous().project;
@@ -233,6 +248,21 @@ function closeOwned() {
     });
   return closing;
 }
+function failedStartup(title, detail) {
+  process.exitCode = 1;
+  dialog.showErrorBox(title, detail);
+  // Explicit Electron exit is reserved for failed startup and follows the same retained-work drain.
+  // app.quit() ignores process.exitCode on the pinned runtime; it remains the ordinary success path.
+  void finishFailedStartup(owner, profile, (code) => {
+    exiting = true;
+    app.exit(code);
+  }).catch(() => {
+    dialog.showErrorBox(
+      'Startup ownership retained',
+      'Accepted local work did not finish normally. The application and ownership evidence remain for review; no forced successful shutdown was attempted.',
+    );
+  });
+}
 app.on('before-quit', (event) => {
   if (!exiting) {
     event.preventDefault();
@@ -275,7 +305,7 @@ try {
       minWidth: 980,
       minHeight: 700,
       show: false,
-      title: 'Documentation Quality Workbench | Jason Stys | 1.1.0',
+      title: 'Documentation Quality Workbench | Jason Stys | 1.1.1',
       webPreferences: {
         preload: join(ownerRoot, 'preload.cjs'),
         sandbox: true,
@@ -360,28 +390,14 @@ try {
     window.show();
   });
   startup.catch(() => {
-    process.exitCode = 1;
-    dialog.showErrorBox(
+    failedStartup(
       'Workbench did not start',
       'The source, private profile or actual application could not be opened. Existing files were preserved.',
     );
-    exiting = true;
-    profile?.close();
-    app.quit();
   });
 } catch {
-  process.exitCode = 1;
-  dialog.showErrorBox(
+  failedStartup(
     'Private workspace was refused',
     'Choose an empty or identified ordinary local profile outside application resources. Existing data and ownership evidence were preserved.',
   );
-  exiting = true;
-  // Chromium has not started here. Release only this launch's exact retained token;
-  // a preexisting or subsequently changed owner lock must remain for review.
-  try {
-    profile?.close();
-  } catch {
-    // close() already refuses changed ownership and preserves that evidence.
-  }
-  app.quit();
 }
