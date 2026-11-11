@@ -3,7 +3,7 @@
  * @description Evaluates metadata, structure, links, accessibility, examples, warnings, and identifiers.
  * @remarks Key declarations are listed in source order; verified locations live in docs/code-map.md.
  */
-import { access } from 'node:fs/promises';
+import { lstat } from 'node:fs/promises';
 import path from 'node:path';
 import { createDiagnostic } from './diagnostics.js';
 import type {
@@ -157,10 +157,50 @@ function documentDiagnostic(
   });
 }
 
-/** Tests whether a filesystem path exists without leaking the platform-specific error. */
-async function pathExists(candidate: string): Promise<boolean> {
+/** Resolve only a relative URL path inside the selected repository, before any filesystem operation. */
+export function repositoryLinkTarget(
+  rootDirectory: string,
+  sourceDirectory: string,
+  rawFile: string,
+): string | null {
+  const decoded = decodePath(rawFile);
+  if (
+    decoded.includes('\\') ||
+    decoded.includes('\0') ||
+    path.isAbsolute(decoded) ||
+    path.win32.isAbsolute(decoded) ||
+    /^[a-z][a-z\d+.-]*:/iu.test(decoded)
+  )
+    return null;
+  const relative = path.relative(
+    path.resolve(rootDirectory),
+    path.resolve(sourceDirectory, decoded),
+  );
+  if (
+    relative === '..' ||
+    relative.startsWith('..' + path.sep) ||
+    path.isAbsolute(relative)
+  )
+    return null;
+  return relative.replaceAll('\\', '/');
+}
+
+/** Refuse static symlink/junction components below the admitted root; never probe through an outside alias. */
+async function localTargetExists(
+  rootDirectory: string,
+  relative: string,
+): Promise<boolean> {
+  let candidate = path.resolve(rootDirectory);
+  const parts = relative.split('/').filter(Boolean);
   try {
-    await access(candidate);
+    for (let index = 0; index < parts.length; index++) {
+      candidate = path.join(candidate, parts[index]!);
+      const stat = await lstat(candidate);
+      if (stat.isSymbolicLink() || (index < parts.length - 1 && !stat.isDirectory()))
+        return false;
+      if (index === parts.length - 1 && !stat.isFile() && !stat.isDirectory())
+        return false;
+    }
     return true;
   } catch {
     return false;
@@ -196,25 +236,23 @@ async function evaluateLocalLinks(
     const normalizedFile =
       rawFile.length === 0
         ? document.relativePath
-        : path
-            .relative(
-              rootDirectory,
-              path.resolve(path.dirname(document.absolutePath), decodePath(rawFile)),
-            )
-            .replaceAll('\\', '/');
-    const targetDocument = documentsByPath.get(normalizedFile);
-    const absoluteTarget = path.resolve(rootDirectory, normalizedFile);
+        : repositoryLinkTarget(
+            rootDirectory,
+            path.dirname(document.absolutePath),
+            rawFile,
+          );
+    const targetDocument =
+      normalizedFile === null ? undefined : documentsByPath.get(normalizedFile);
     if (
-      rawFile.length > 0 &&
-      targetDocument === undefined &&
-      !(await pathExists(absoluteTarget))
+      normalizedFile === null ||
+      (rawFile.length > 0 && !(await localTargetExists(rootDirectory, normalizedFile)))
     ) {
       diagnostics.push(
         documentDiagnostic(
           document,
           'DQ005',
           'error',
-          `Local link target does not exist: ${rawFile}`,
+          `Local link target is missing or outside the ordinary repository tree: ${rawFile}`,
           'Create the target or update the relative path and preserve filename casing.',
           link.location,
         ),
@@ -263,6 +301,7 @@ export async function evaluateRules(
       for (const key of configuration.requiredMetadata) {
         const value = document.metadata[key];
         if (
+          !Object.hasOwn(document.metadata, key) ||
           value === undefined ||
           value === null ||
           (typeof value === 'string' && value.trim().length === 0)

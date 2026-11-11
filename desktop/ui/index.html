@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documentation Quality Workbench — Jason Stys</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="eyebrow">Jason Stys · Engineering workbench</p>
+        <h1>Documentation Quality</h1>
+        <p>
+          Author a consistent corpus. Review exact findings. Keep accepted debt visible.
+        </p>
+      </div>
+      <button id="quit">Exit application</button>
+    </header>
+    <nav aria-label="Workspace actions">
+      <button id="save" class="primary">Save changes</button
+      ><button id="analyze">Analyze saved corpus</button
+      ><button id="prepared">Load prepared runbook</button
+      ><button id="import-project">Import corpus</button
+      ><button id="restore">Restore previous save</button
+      ><button id="help">How to use</button>
+    </nav>
+    <p id="status" role="status">Opening the private workspace…</p>
+    <section id="help-panel" hidden>
+      <h2>Local authoring and review</h2>
+      <ol>
+        <li>
+          Edit documents, exact logical names and policy. Add or remove the fields your
+          team actually requires.
+        </li>
+        <li>
+          Save changes, then analyze the saved corpus. Findings use the original CLI
+          parsers, rules, governance and reports.
+        </li>
+        <li>
+          Select a finding for exact source and location. Editing invalidates the result
+          until you save and analyze again.
+        </li>
+        <li>
+          Fix findings or deliberately accept the exact reviewed baseline with a reason.
+          Accepted debt and unexamined entries remain visible.
+        </li>
+        <li>
+          Export a portable corpus or the actual JSON, SARIF and HTML reports. Existing
+          files are never overwritten.
+        </li>
+      </ol>
+      <p>
+        All data stays local and plaintext under your OS account. No document scripts,
+        repository commands, external links, accounts or telemetry run. Use authorized
+        material. Native corpus limits: 64 documents, 1 MiB each, 8 MiB document text; 16
+        inert attachments, 2 MiB total. The CLI retains its separate repository/network
+        options.
+      </p>
+    </section>
+    <main>
+      <section class="files card">
+        <h2>Corpus</h2>
+        <label>Corpus title<input id="title" maxlength="100" /></label>
+        <div class="pair">
+          <button id="add">New document</button
+          ><button id="import-document">Import document</button>
+        </div>
+        <div id="documents" aria-label="Documents"></div>
+        <h3>Inert link assets</h3>
+        <p class="muted">
+          Attachments satisfy local references; they are never executed or rendered.
+        </p>
+        <button id="import-attachment">Add attachment</button>
+        <ul id="attachments"></ul>
+        <h3>Quality policy</h3>
+        <label
+          >Required front-matter fields<input
+            id="metadata"
+            placeholder="title, owner" /></label
+        ><label
+          >Gate fails at<select id="threshold">
+            <option>error</option>
+            <option>warning</option>
+            <option>notice</option>
+            <option>none</option>
+          </select></label
+        >
+        <details>
+          <summary>Governed exceptions</summary>
+          <p>
+            Exact rule / optional document / optional line, reason and optional expiry.
+            JSON array; validation refuses unknown fields.
+          </p>
+          <textarea
+            id="exceptions"
+            aria-label="Governed exceptions JSON"
+            rows="8"
+            spellcheck="false"
+          ></textarea>
+        </details>
+      </section>
+      <section class="editor card">
+        <div class="section-title">
+          <h2>Document editor</h2>
+          <button id="remove">Remove document</button>
+        </div>
+        <label>Logical relative filename<input id="filename" /></label
+        ><label class="inline"
+          ><input type="checkbox" id="selected" />Include this document in the scan</label
+        ><label
+          >Markdown or HTML source<textarea
+            id="source"
+            spellcheck="false"
+            aria-label="Document source"
+          ></textarea>
+        </label>
+        <p class="muted">
+          HTML is inspected as text. Source scripts, frames and forms are never displayed
+          or executed.
+        </p>
+      </section>
+      <section class="review card">
+        <h2>Review</h2>
+        <div id="summary" class="summary">Save and analyze to create a review.</div>
+        <label
+          >Find in results<input
+            id="search"
+            placeholder="Rule, filename or message" /></label
+        ><label class="inline"
+          ><input type="checkbox" id="show-suppressed" checked />Show accepted and
+          excepted findings</label
+        >
+        <div id="findings" aria-label="Quality findings"></div>
+        <h3>Baseline review</h3>
+        <p id="debt">No reviewed baseline.</p>
+        <details>
+          <summary>Baseline entry states</summary>
+          <ul id="baseline"></ul>
+        </details>
+        <label
+          >Reason for accepting reviewed debt<textarea
+            id="reason"
+            rows="3"
+            placeholder="Explain why this exact finding is accepted and how it will be reviewed."
+            maxlength="1000"
+          ></textarea></label
+        ><button id="accept">Accept exact reviewed baseline</button>
+        <p id="decision" class="muted"></p>
+      </section>
+    </main>
+    <section id="inspection" class="card" hidden>
+      <h2 id="inspection-title">Exact saved source</h2>
+      <textarea
+        id="inspection-source"
+        readonly
+        spellcheck="false"
+        aria-label="Exact saved source"
+      ></textarea
+      ><button id="close-inspection">Close source inspection</button>
+    </section>
+    <footer>
+      <div>
+        <strong>Made by Jason Stys · v1.1.0</strong>
+        <p>
+          github.com/JasonStys · Offline owner-local reference workflow · Unsigned Windows
+          application
+        </p>
+      </div>
+      <div class="exports">
+        <button data-export="project">Export corpus</button
+        ><button data-export="json">JSON report</button
+        ><button data-export="sarif">SARIF report</button
+        ><button data-export="html">HTML report</button>
+      </div>
+    </footer>
+  </body>
+</html>

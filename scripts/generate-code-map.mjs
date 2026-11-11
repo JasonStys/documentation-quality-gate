@@ -21,7 +21,11 @@ async function collect(directory) {
   const files = [];
   for (const entry of entries) {
     const absolute = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...(await collect(absolute)));
+    if (
+      entry.isDirectory() &&
+      !['node_modules', '.runtime', 'release'].includes(entry.name)
+    )
+      files.push(...(await collect(absolute)));
     else if (entry.isFile() && /\.[cm]?[jt]s$/u.test(entry.name)) files.push(absolute);
   }
   return files;
@@ -65,7 +69,7 @@ function declarations(file, source) {
 
 const files = (
   await Promise.all(
-    ['src', 'scripts', 'tests'].map((dir) => collect(path.join(root, dir))),
+    ['src', 'scripts', 'tests', 'desktop'].map((dir) => collect(path.join(root, dir))),
   )
 ).flat();
 const lines = [
